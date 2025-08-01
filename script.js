@@ -1,5 +1,290 @@
+// ===== WHATSAPP CONFIGURATION =====
+const WHATSAPP_CONFIG = {
+    // Günlere göre numaralar (0: Pazar, 1: Pazartesi, 2: Salı, 3: Çarşamba, 4: Perşembe, 5: Cuma, 6: Cumartesi)
+    dailyNumbers: {
+        0: { // Pazar
+            morning: '905555555550', // 09:00-18:00
+            evening: '905555555551'  // 18:00-09:00
+        },
+        1: { // Pazartesi
+            morning: '905555555552',
+            evening: '905555555553'
+        },
+        2: { // Salı
+            morning: '905555555554',
+            evening: '905555555555'
+        },
+        3: { // Çarşamba
+            morning: '905555555556',
+            evening: '905555555557'
+        },
+        4: { // Perşembe
+            morning: '905555555558',
+            evening: '905555555559'
+        },
+        5: { // Cuma
+            morning: '905555555560',
+            evening: '905555555561'
+        },
+        6: { // Cumartesi
+            morning: '905555555562',
+            evening: '905555555563'
+        }
+    },
+    messages: {
+        visa: 'Merhaba! Vize danışmanlığı hizmetleri hakkında bilgi almak istiyorum.',
+        ticketing: 'Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum.',
+        contact: 'Merhaba! Cihanturizm ile iletişime geçmek istiyorum.'
+    },
+    adminSettings: {
+        enabled: true,
+        username: 'admin',
+        password: 'cihan123'
+    }
+};
+
+// Local storage'dan config'i yükle
+function loadWhatsAppConfig() {
+    const savedConfig = localStorage.getItem('whatsapp_config');
+    if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        Object.assign(WHATSAPP_CONFIG, config);
+    }
+}
+
+// ===== WHATSAPP FUNCTIONS =====
+function getWhatsAppNumber() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+    const hour = now.getHours();
+    
+    // Günün numarasını al
+    const dayNumber = WHATSAPP_CONFIG.dailyNumbers[dayOfWeek];
+    
+    // 09:00-18:00 arası gündüz numarası, diğer saatler gece numarası
+    if (hour >= 9 && hour < 18) {
+        return dayNumber.morning;
+    } else {
+        return dayNumber.evening;
+    }
+}
+
+function openWhatsApp(type = 'contact') {
+    const number = getWhatsAppNumber();
+    const message = WHATSAPP_CONFIG.messages[type] || WHATSAPP_CONFIG.messages.contact;
+    
+    // WhatsApp URL'sini oluştur
+    const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    
+    // Yeni sekmede WhatsApp'ı aç
+    window.open(whatsappUrl, '_blank');
+    
+    // Console log
+    console.log(`WhatsApp açıldı:`, {
+        type: type,
+        number: number,
+        message: message,
+        url: whatsappUrl
+    });
+}
+
+// ===== ADMIN PANEL FUNCTIONS =====
+function showLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+        
+        // Input'ları temizle ve focus'u ayarla
+        const usernameInput = document.getElementById('admin-username');
+        const passwordInput = document.getElementById('admin-password');
+        
+        if (usernameInput) {
+            usernameInput.value = '';
+            usernameInput.focus();
+        }
+        if (passwordInput) {
+            passwordInput.value = '';
+        }
+        
+        // Modal dışına tıklandığında kapatma
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                hideLoginModal();
+            }
+        });
+        
+        // Enter tuşu ile giriş
+        const handleEnterKey = function(e) {
+            if (e.key === 'Enter') {
+                loginAdmin();
+            }
+        };
+        
+        if (usernameInput) usernameInput.addEventListener('keypress', handleEnterKey);
+        if (passwordInput) passwordInput.addEventListener('keypress', handleEnterKey);
+    }
+}
+
+function hideLoginModal() {
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+        
+        // Input'ları temizle
+        const usernameInput = document.getElementById('admin-username');
+        const passwordInput = document.getElementById('admin-password');
+        
+        if (usernameInput) usernameInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+    }
+}
+
+function loginAdmin() {
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    
+    console.log('Login attempt:', {
+        username: username,
+        password: password,
+        expectedUsername: WHATSAPP_CONFIG.adminSettings.username,
+        expectedPassword: WHATSAPP_CONFIG.adminSettings.password
+    });
+    
+    // Boş alan kontrolü
+    if (!username || !password) {
+        showNotification('Kullanıcı adı ve şifre alanları boş bırakılamaz!', 'error');
+        return;
+    }
+    
+    if (username === WHATSAPP_CONFIG.adminSettings.username && 
+        password === WHATSAPP_CONFIG.adminSettings.password) {
+        
+        // Login başarılı
+        hideLoginModal();
+        
+        // Session'a kaydet (30 dakika)
+        const sessionData = {
+            loggedIn: true,
+            timestamp: Date.now(),
+            expires: Date.now() + (30 * 60 * 1000) // 30 dakika
+        };
+        localStorage.setItem('admin_session', JSON.stringify(sessionData));
+        
+        showNotification('Admin paneline başarıyla giriş yapıldı!', 'success');
+        console.log('Admin girişi başarılı');
+        
+        // Admin sayfasına yönlendir
+        setTimeout(() => {
+            window.location.href = 'admin.html';
+        }, 1000);
+        
+    } else {
+        // Login başarısız - detaylı hata mesajı
+        let errorMessage = 'Giriş başarısız! ';
+        
+        if (username !== WHATSAPP_CONFIG.adminSettings.username) {
+            errorMessage += 'Kullanıcı adı hatalı. ';
+        }
+        if (password !== WHATSAPP_CONFIG.adminSettings.password) {
+            errorMessage += 'Şifre hatalı. ';
+        }
+        
+        showNotification(errorMessage, 'error');
+        console.log('Login failed:', {
+            usernameMatch: username === WHATSAPP_CONFIG.adminSettings.username,
+            passwordMatch: password === WHATSAPP_CONFIG.adminSettings.password
+        });
+        
+        const passwordInput = document.getElementById('admin-password');
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+    }
+}
+
+function checkAdminSession() {
+    const sessionData = localStorage.getItem('admin_session');
+    if (sessionData) {
+        const session = JSON.parse(sessionData);
+        const now = Date.now();
+        
+        if (session.loggedIn && now < session.expires) {
+            return true;
+        } else {
+            // Session süresi dolmuş, temizle
+            localStorage.removeItem('admin_session');
+        }
+    }
+    return false;
+}
+
+function logoutAdmin() {
+    localStorage.removeItem('admin_session');
+    showNotification('Admin panelinden çıkış yapıldı!', 'info');
+    console.log('Admin çıkışı yapıldı');
+    
+    // Eğer admin sayfasındaysa ana sayfaya yönlendir
+    if (window.location.pathname.includes('admin.html')) {
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+    }
+}
+
+// ===== INITIALIZATION =====
+function initializeWhatsApp() {
+    // WhatsApp butonlarına hover efekti ekle
+    const whatsappButtons = document.querySelectorAll('.whatsapp-button, .whatsapp-fab');
+    whatsappButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // Admin linkine tıklama olayı ekle
+    const adminLink = document.getElementById('admin-login-link');
+    if (adminLink) {
+        adminLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showLoginModal();
+        });
+    }
+    
+    // Modal dışına tıklayınca kapatma
+    const modal = document.getElementById('admin-login-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                hideLoginModal();
+            }
+        });
+    }
+    
+    // Enter tuşu ile giriş yapma
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && modal && modal.style.display === 'flex') {
+            loginAdmin();
+        }
+    });
+    
+    console.log('WhatsApp sistemi başlatıldı:', {
+        currentNumber: getWhatsAppNumber(),
+        config: WHATSAPP_CONFIG
+    });
+}
+
 // ===== DOM CONTENT LOADED =====
 document.addEventListener('DOMContentLoaded', function() {
+    // WhatsApp config'ini yükle
+    loadWhatsAppConfig();
+    
     initializeApp();
 });
 
@@ -34,6 +319,9 @@ function initializeApp() {
     
     // Hero slider
     initializeHeroSlider();
+    
+    // WhatsApp initialization
+    initializeWhatsApp();
     
     // SEO optimizations
     initializeSEOOptimizations();
@@ -170,22 +458,6 @@ function showNotification(message, type = 'info') {
             <span class="notification-message">${message}</span>
             <button class="notification-close">&times;</button>
         </div>
-    `;
-    
-    // Add styles
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#4CAF50' : '#2196F3'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-        z-index: 10000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        max-width: 300px;
     `;
     
     // Add to page

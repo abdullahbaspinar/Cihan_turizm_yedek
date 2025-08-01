@@ -344,7 +344,12 @@
                             Tüm ülkeler için profesyonel vize danışmanlığı hizmeti. 
                             Deneyimli ekibimizle başvuru sürecinizi kolaylaştırıyoruz.
                         </p>
-                        <button class="service-cta">Detaylı Bilgi</button>
+                        <div class="service-actions">
+                            <button class="whatsapp-button service-whatsapp" onclick="openWhatsApp('visa')">
+                                <img src="assets/logo/wp-logo.jpg" alt="WhatsApp" class="whatsapp-icon">
+                                <span>Detaylı Bilgi</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -378,7 +383,12 @@
                             THY Corporate Club üyeliği ile uçak bileti, otel rezervasyonu 
                             ve araç kiralama hizmetlerinde anlık fiyat takibi.
                         </p>
-                        <button class="service-cta">Detaylı Bilgi</button>
+                        <div class="service-actions">
+                            <button class="whatsapp-button service-whatsapp" onclick="openWhatsApp('ticketing')">
+                                <img src="assets/logo/wp-logo.jpg" alt="WhatsApp" class="whatsapp-icon">
+                                <span>Detaylı Bilgi</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -551,11 +561,46 @@
                             <p><a href="mailto:info@cihanturizm.com">info@cihanturizm.com</a></p>
                         </div>
                     </div>
+                    
+                    <div class="info-item whatsapp-contact">
+                        <div class="info-icon">
+                            <img src="assets/logo/wp-logo.jpg" alt="WhatsApp Logo" class="whatsapp-logo">
+                        </div>
+                        <div class="info-content">
+                            <h4>WhatsApp</h4>
+                            <button class="whatsapp-contact-btn" onclick="openWhatsApp('contact')" aria-label="WhatsApp ile iletişime geç">
+                                <span>WhatsApp'tan Yaz</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
     </main>
+
+    <!-- Admin Login Modal -->
+    <div class="admin-login-modal" id="admin-login-modal">
+        <div class="login-modal-content">
+            <div class="login-header">
+                <h3>Admin Girişi</h3>
+                <button class="login-close" onclick="hideLoginModal()">×</button>
+            </div>
+            <div class="login-body">
+                <div class="login-form">
+                    <div class="form-group">
+                        <label for="admin-username">Kullanıcı Adı:</label>
+                        <input type="text" id="admin-username" placeholder="Kullanıcı adınızı girin">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password">Şifre:</label>
+                        <input type="password" id="admin-password" placeholder="Şifrenizi girin">
+                    </div>
+                    <button onclick="loginAdmin()" class="login-submit">Giriş Yap</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer" role="contentinfo">
@@ -616,6 +661,12 @@
                 </div>
                 <div class="footer-copyright">
                     <p>&copy; 2025 Cihanturizm. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="footer-admin">
+                    <a href="#" class="admin-link" id="admin-login-link">
+                        <span class="material-icons">admin_panel_settings</span>
+                        <span>Yönetici Girişi</span>
+                    </a>
                 </div>
             </div>
         </div>

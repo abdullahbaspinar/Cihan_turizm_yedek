@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Yönetim Paneli - Cihanturizm</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/ercihanlogo-transparent.png">
+    
+    <!-- Session Protection Script -->
+    <script>
+        // Sayfa yüklenmeden önce session kontrolü
+        (function() {
+            const sessionData = localStorage.getItem('admin_session');
+            if (!sessionData) {
+                // Session yoksa ana sayfaya yönlendir
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const session = JSON.parse(sessionData);
+            const now = Date.now();
+            
+            if (!session.loggedIn || now >= session.expires) {
+                // Session geçersiz veya süresi dolmuş
+                localStorage.removeItem('admin_session');
+                window.location.href = 'index.html';
+                return;
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <div class="admin-logo">
+                <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image">
+                <span class="admin-title">WhatsApp Yönetim Paneli</span>
+            </div>
+            
+            <div class="admin-user-info">
+                <span class="user-name">Hoş geldiniz, Admin</span>
+                <button class="logout-btn" onclick="logoutAdmin()">
+                    <span class="material-icons">logout</span>
+                    <span>Çıkış Yap</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Main Content -->
+    <main class="admin-main">
+        <div class="admin-container">
+            <!-- Dashboard Overview -->
+            <section class="admin-section">
+                <h2>
+                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">dashboard</span>
+                    Dashboard
+                </h2>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <span class="material-icons">phone</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Mevcut WhatsApp Numarası</h3>
+                            <p id="current-whatsapp-number">Yükleniyor...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <span class="material-icons">schedule</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Son Güncelleme</h3>
+                            <p id="last-update">Yükleniyor...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <span class="material-icons">today</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Bugün</h3>
+                            <p id="current-day">Yükleniyor...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <span class="material-icons">access_time</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Saat</h3>
+                            <p id="current-time">Yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WhatsApp Number Management -->
+            <section class="admin-section">
+                <h2>
+                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">settings_phone</span>
+                    WhatsApp Numarası Yönetimi
+                </h2>
+                
+                <div class="number-management">
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Pazartesi Günü Numaraları
+                        </h3>
+                        <p>Pazartesi günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="pazartesi-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="pazartesi-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(1)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Salı Günü Numaraları
+                        </h3>
+                        <p>Salı günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="sali-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="sali-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(2)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Çarşamba Günü Numaraları
+                        </h3>
+                        <p>Çarşamba günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="carsamba-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="carsamba-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(3)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Perşembe Günü Numaraları
+                        </h3>
+                        <p>Perşembe günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="persembe-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="persembe-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(4)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Cuma Günü Numaraları
+                        </h3>
+                        <p>Cuma günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="cuma-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="cuma-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(5)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Cumartesi Günü Numaraları
+                        </h3>
+                        <p>Cumartesi günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="cumartesi-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="cumartesi-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(6)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="number-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
+                            Pazar Günü Numaraları
+                        </h3>
+                        <p>Pazar günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label class="time-label">Sabah (09:00-18:00)</label>
+                                <input type="text" id="pazar-morning" placeholder="Sabah numarası" value="">
+                            </div>
+                            <div class="input-field">
+                                <label class="time-label">Akşam (18:00-09:00)</label>
+                                <input type="text" id="pazar-evening" placeholder="Akşam numarası" value="">
+                            </div>
+                            <button onclick="updateDayNumbers(0)" class="update-btn">
+                                <span class="material-icons">save</span>
+                                Güncelle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Message Management -->
+            <section class="admin-section">
+                <h2>
+                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">message</span>
+                    WhatsApp Mesaj Yönetimi
+                </h2>
+                
+                <div class="message-management">
+                    <div class="message-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">chat_bubble</span>
+                            Bölüm Bazlı Mesajlar
+                        </h3>
+                        <p>Her bölüm için farklı WhatsApp mesajları ayarlayabilirsiniz.</p>
+                        
+                        <div class="message-inputs">
+                            <div class="message-input">
+                                <label>
+                                    <span class="material-icons" style="margin-right: 5px; font-size: 16px; color: #0D47A1;">security</span>
+                                    Vize Danışmanlığı Mesajı:
+                                </label>
+                                <textarea id="visa-message" rows="3" placeholder="Merhaba! Vize danışmanlığı hizmetleri hakkında bilgi almak istiyorum."></textarea>
+                            </div>
+                            
+                            <div class="message-input">
+                                <label>
+                                    <span class="material-icons" style="margin-right: 5px; font-size: 16px; color: #0D47A1;">flight</span>
+                                    Biletleme Hizmetleri Mesajı:
+                                </label>
+                                <textarea id="ticketing-message" rows="3" placeholder="Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum."></textarea>
+                            </div>
+                            
+                            <div class="message-input">
+                                <label>
+                                    <span class="material-icons" style="margin-right: 5px; font-size: 16px; color: #0D47A1;">contact_support</span>
+                                    İletişim Sayfası Mesajı:
+                                </label>
+                                <textarea id="contact-message" rows="3" placeholder="Merhaba! Cihanturizm ile iletişime geçmek istiyorum."></textarea>
+                            </div>
+                        </div>
+                        
+                        <button onclick="updateMessages()" class="update-btn">
+                            <span class="material-icons">save</span>
+                            Mesajları Güncelle
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings -->
+            <section class="admin-section">
+                <h2>
+                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">settings</span>
+                    Ayarlar
+                </h2>
+                
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>
+                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">home</span>
+                            Ana Sayfaya Dön
+                        </h3>
+                        <p>Ana sayfaya geri dönmek için tıklayın.</p>
+                        <a href="index.html" class="home-btn">
+                            <span class="material-icons">home</span>
+                            Ana Sayfa
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Admin sayfası için özel script
+        document.addEventListener('DOMContentLoaded', function() {
+            // Session kontrolü (ekstra güvenlik)
+            if (!checkAdminSession()) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Admin sayfası başlat
+            initializeAdminPage();
+            
+            // Sayfa animasyonları
+            addPageAnimations();
+        });
+        
+        function addPageAnimations() {
+            // Dashboard kartları için animasyon
+            const dashboardCards = document.querySelectorAll('.dashboard-card');
+            dashboardCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+            
+            // Section'lar için animasyon
+            const sections = document.querySelectorAll('.admin-section');
+            sections.forEach((section, index) => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    section.style.transition = 'all 0.8s ease';
+                    section.style.opacity = '1';
+                    section.style.transform = 'translateY(0)';
+                }, (index + 2) * 300);
+            });
+        }
+        
+        function initializeAdminPage() {
+            // Dashboard verilerini yükle
+            loadDashboardData();
+            
+            // Form verilerini yükle
+            loadAdminFormData();
+            
+            // Her 30 saniyede bir güncelle
+            setInterval(loadDashboardData, 30000);
+        }
+        
+        function loadDashboardData() {
+            // Mevcut numarayı göster
+            const currentNumberElement = document.getElementById('current-whatsapp-number');
+            if (currentNumberElement) {
+                currentNumberElement.textContent = getWhatsAppNumber();
+                addPulseAnimation(currentNumberElement);
+            }
+            
+            // Son güncelleme zamanını göster
+            const lastUpdateElement = document.getElementById('last-update');
+            if (lastUpdateElement) {
+                lastUpdateElement.textContent = new Date().toLocaleString('tr-TR');
+            }
+            
+            // Bugünü göster
+            const currentDayElement = document.getElementById('current-day');
+            if (currentDayElement) {
+                const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+                const today = new Date().getDay();
+                currentDayElement.textContent = days[today];
+            }
+            
+            // Saati göster
+            const currentTimeElement = document.getElementById('current-time');
+            if (currentTimeElement) {
+                currentTimeElement.textContent = new Date().toLocaleTimeString('tr-TR');
+            }
+        }
+        
+        function addPulseAnimation(element) {
+            element.style.animation = 'pulse 0.6s ease';
+            setTimeout(() => {
+                element.style.animation = '';
+            }, 600);
+        }
+        
+        function loadAdminFormData() {
+            // Günlere göre numaraları yükle (Pazartesi'den başlayıp Pazar'da bitiyor)
+            const dayNames = ['pazar', 'pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi'];
+            
+            dayNames.forEach((dayName, dayIndex) => {
+                const morningInput = document.getElementById(`${dayName}-morning`);
+                const eveningInput = document.getElementById(`${dayName}-evening`);
+                
+                if (morningInput && WHATSAPP_CONFIG.dailyNumbers[dayIndex]) {
+                    morningInput.value = WHATSAPP_CONFIG.dailyNumbers[dayIndex].morning || '';
+                }
+                if (eveningInput && WHATSAPP_CONFIG.dailyNumbers[dayIndex]) {
+                    eveningInput.value = WHATSAPP_CONFIG.dailyNumbers[dayIndex].evening || '';
+                }
+            });
+            
+            // Mesajları yükle
+            const messageInputs = {
+                'visa-message': WHATSAPP_CONFIG.messages.visa,
+                'ticketing-message': WHATSAPP_CONFIG.messages.ticketing,
+                'contact-message': WHATSAPP_CONFIG.messages.contact
+            };
+            
+            Object.keys(messageInputs).forEach(id => {
+                const textarea = document.getElementById(id);
+                if (textarea) {
+                    textarea.value = messageInputs[id];
+                }
+            });
+        }
+        
+        function updateDayNumbers(dayIndex) {
+            const dayNames = ['pazar', 'pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi'];
+            const dayName = dayNames[dayIndex];
+            
+            const morningInput = document.getElementById(`${dayName}-morning`);
+            const eveningInput = document.getElementById(`${dayName}-evening`);
+            
+            if (morningInput && eveningInput && morningInput.value.trim() && eveningInput.value.trim()) {
+                // WHATSAPP_CONFIG'i güncelle
+                if (!WHATSAPP_CONFIG.dailyNumbers[dayIndex]) {
+                    WHATSAPP_CONFIG.dailyNumbers[dayIndex] = {};
+                }
+                
+                WHATSAPP_CONFIG.dailyNumbers[dayIndex].morning = morningInput.value.trim();
+                WHATSAPP_CONFIG.dailyNumbers[dayIndex].evening = eveningInput.value.trim();
+                
+                // localStorage'a kaydet
+                localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
+                
+                showSuccessNotification(`${dayNames[dayIndex].charAt(0).toUpperCase() + dayNames[dayIndex].slice(1)} günü numaraları başarıyla güncellendi!`);
+                addPulseAnimation(morningInput);
+                addPulseAnimation(eveningInput);
+            } else {
+                showErrorNotification('Lütfen her iki numarayı da girin!');
+            }
+        }
+        
+        function updateMessages() {
+            const messageInputs = {
+                'visa-message': 'visa',
+                'ticketing-message': 'ticketing',
+                'contact-message': 'contact'
+            };
+            
+            let hasChanges = false;
+            
+            Object.keys(messageInputs).forEach(id => {
+                const textarea = document.getElementById(id);
+                if (textarea && textarea.value.trim()) {
+                    WHATSAPP_CONFIG.messages[messageInputs[id]] = textarea.value.trim();
+                    hasChanges = true;
+                }
+            });
+            
+            if (hasChanges) {
+                localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
+                showSuccessNotification('Mesajlar başarıyla güncellendi!');
+            } else {
+                showErrorNotification('Lütfen en az bir mesaj girin!');
+            }
+        }
+        
+        function showSuccessNotification(message) {
+            showNotification(message, 'success');
+        }
+        
+        function showErrorNotification(message) {
+            showNotification(message, 'error');
+        }
+        
+        // Global fonksiyonları ekle
+        window.updateDayNumbers = updateDayNumbers;
+        window.updateMessages = updateMessages;
+    </script>
+    
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .admin-section {
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dashboard-card {
+            animation: slideInUp 0.6s ease;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body>
+</html> 
