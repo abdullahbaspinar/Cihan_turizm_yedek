@@ -1,5 +1,45 @@
 {
-  "content": {},
-  "images": {},
-  "whatsapp": {}
+  "content": {
+    "hero-title-1": "TEST BAŞLIK",
+    "hero-title-2": "TEST BAŞLIK 2", 
+    "hero-title-3": "TEST BAŞLIK 3",
+    "hero-subtitle": "Test alt başlık denemesi",
+    "hero-cta-text": "Test Hizmetleri",
+    "vision-title": "Test Vizyonumuz",
+    "vision-description": "Test vizyon açıklaması",
+    "mission-title": "Test Misyonumuz",
+    "mission-description": "Test misyon açıklaması",
+    "services-title": "Test Hizmetlerimiz",
+    "services-subtitle": "Test hizmet açıklaması",
+    "visa-title": "Test Vize Hizmeti",
+    "visa-description": "Test vize açıklaması",
+    "ticketing-title": "Test Biletleme",
+    "ticketing-description": "Test biletleme açıklaması",
+    "contact-title": "Test İletişim",
+    "contact-subtitle": "Test iletişim açıklaması",
+    "contact-address": "Test Adres",
+    "contact-phone": "Test Telefon",
+    "contact-email": "test@test.com",
+    "footer-description": "Test footer açıklaması",
+    "footer-copyright": "Test Copyright"
+  },
+  "images": {
+    "hero-image-1": "assets/anasayfa/header-1.webp"
+  },
+  "whatsapp": {
+    "dailyNumbers": [
+      { "morning": "905321111111", "evening": "905321111112" },
+      { "morning": "905321111113", "evening": "905321111114" },
+      { "morning": "905321111115", "evening": "905321111116" },
+      { "morning": "905321111117", "evening": "905321111118" },
+      { "morning": "905321111119", "evening": "905321111120" },
+      { "morning": "905321111121", "evening": "905321111122" },
+      { "morning": "905321111123", "evening": "905321111124" }
+    ],
+    "messages": {
+      "contact": "Merhaba! Cihanturizm hakkında bilgi almak istiyorum.",
+      "visa": "Merhaba! Vize hizmetleri hakkında bilgi almak istiyorum.",
+      "ticketing": "Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum."
+    }
+  }
 } 

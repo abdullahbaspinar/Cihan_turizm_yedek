@@ -768,13 +768,25 @@
                 
                 // Update content if available
                 if (data.content) {
-                    // Hero content
+                    // Hero content - Using class selectors
                     if (data.content['hero-title-1']) {
                         const titleLines = document.querySelectorAll('.hero-title .title-line');
-                        if (titleLines.length >= 3) {
+                        if (titleLines.length >= 1) {
                             titleLines[0].textContent = data.content['hero-title-1'];
-                            titleLines[1].textContent = data.content['hero-title-2'] || titleLines[1].textContent;
-                            titleLines[2].textContent = data.content['hero-title-3'] || titleLines[2].textContent;
+                        }
+                    }
+                    
+                    if (data.content['hero-title-2']) {
+                        const titleLines = document.querySelectorAll('.hero-title .title-line');
+                        if (titleLines.length >= 2) {
+                            titleLines[1].textContent = data.content['hero-title-2'];
+                        }
+                    }
+                    
+                    if (data.content['hero-title-3']) {
+                        const titleLines = document.querySelectorAll('.hero-title .title-line');
+                        if (titleLines.length >= 3) {
+                            titleLines[2].textContent = data.content['hero-title-3'];
                         }
                     }
                     
@@ -892,6 +904,9 @@
                 if (data.whatsapp) {
                     // Store WhatsApp config for use in script.js
                     localStorage.setItem('whatsapp_config', JSON.stringify(data.whatsapp));
+                    console.log('WhatsApp config updated from server');
+                    
+                    // WhatsApp config is already stored in localStorage, script.js will use it
                     console.log('WhatsApp config updated from server');
                 }
             })
