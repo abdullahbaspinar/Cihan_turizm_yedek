@@ -24,10 +24,20 @@ function checkAdminAuthentication() {
     }
 }
 
-// Simple save function
+// Enhanced save function with server sync
 function secureSave(key, data) {
     try {
+        // Save to localStorage
         localStorage.setItem(key, JSON.stringify(data));
+        
+        // Also save to sessionStorage for cross-tab sync
+        sessionStorage.setItem(key, JSON.stringify(data));
+        
+        // Try to sync with server (if available)
+        if (typeof window.syncToServer === 'function') {
+            window.syncToServer(key, data);
+        }
+        
         return true;
     } catch (e) {
         console.error('Kaydetme hatası:', e);
@@ -35,10 +45,22 @@ function secureSave(key, data) {
     }
 }
 
-// Simple load function
+// Enhanced load function with fallback
 function secureLoad(key) {
     try {
-        const data = localStorage.getItem(key);
+        // Try localStorage first
+        let data = localStorage.getItem(key);
+        
+        // If not in localStorage, try sessionStorage
+        if (!data) {
+            data = sessionStorage.getItem(key);
+        }
+        
+        // If still no data, try to load from server
+        if (!data && typeof window.loadFromServer === 'function') {
+            data = window.loadFromServer(key);
+        }
+        
         if (!data) return null;
         return JSON.parse(data);
     } catch (e) {

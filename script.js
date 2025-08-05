@@ -46,12 +46,28 @@ const WHATSAPP_CONFIG = {
     }
 };
 
-// Local storage'dan config'i yükle
+// Enhanced config loading with multiple sources
 function loadWhatsAppConfig() {
-    const savedConfig = localStorage.getItem('whatsapp_config');
+    // Try multiple sources for config
+    let savedConfig = localStorage.getItem('whatsapp_config');
+    
+    // If not in localStorage, try sessionStorage
+    if (!savedConfig) {
+        savedConfig = sessionStorage.getItem('whatsapp_config');
+    }
+    
+    // If still no config, try to load from server
+    if (!savedConfig && typeof window.loadFromServer === 'function') {
+        savedConfig = window.loadFromServer('whatsapp_config');
+    }
+    
     if (savedConfig) {
-        const config = JSON.parse(savedConfig);
-        Object.assign(WHATSAPP_CONFIG, config);
+        try {
+            const config = JSON.parse(savedConfig);
+            Object.assign(WHATSAPP_CONFIG, config);
+        } catch (e) {
+            console.error('WhatsApp config loading error:', e);
+        }
     }
 }
 
@@ -221,7 +237,19 @@ function logoutAdmin() {
 
 // ===== CONTENT MANAGEMENT =====
 function loadContentFromAdmin() {
-    const savedContent = localStorage.getItem('admin_content');
+    // Try multiple sources for content
+    let savedContent = localStorage.getItem('admin_content');
+    
+    // If not in localStorage, try sessionStorage
+    if (!savedContent) {
+        savedContent = sessionStorage.getItem('admin_content');
+    }
+    
+    // If still no content, try to load from server
+    if (!savedContent && typeof window.loadFromServer === 'function') {
+        savedContent = window.loadFromServer('admin_content');
+    }
+    
     if (savedContent) {
         try {
             const content = JSON.parse(savedContent);
@@ -1229,6 +1257,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+
+// ===== CROSS-DEVICE SYNC =====
+// Listen for storage changes to sync across tabs/devices
+window.addEventListener('storage', function(e) {
+    if (e.key === 'admin_content' || e.key === 'whatsapp_config' || e.key === 'admin_images') {
+        console.log('Content updated from another tab/device:', e.key);
+        
+        // Reload content if it was updated
+        if (e.key === 'admin_content') {
+            loadContentFromAdmin();
+        }
+        
+        // Reload WhatsApp config if it was updated
+        if (e.key === 'whatsapp_config') {
+            loadWhatsAppConfig();
+        }
+        
+        // Reload images if they were updated
+        if (e.key === 'admin_images') {
+            loadImagesFromAdmin();
+        }
+    }
 });
 
 // ===== SECURITY MEASURES COMPLETELY REMOVED =====
