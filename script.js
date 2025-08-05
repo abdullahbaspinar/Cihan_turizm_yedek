@@ -58,14 +58,37 @@ function getWhatsAppNumber() {
     const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
     const hour = now.getHours();
     
+    // Admin panelindeki index'e çevir (0=Pazar -> 6, 1=Pazartesi -> 0, 2=Salı -> 1, ...)
+    let adminIndex;
+    if (dayOfWeek === 0) { // Pazar
+        adminIndex = 6;
+    } else {
+        adminIndex = dayOfWeek - 1; // Pazartesi=0, Salı=1, ...
+    }
+    
     // Günün numarasını al
-    const dayNumber = WHATSAPP_CONFIG.dailyNumbers[dayOfWeek];
+    const dayNumber = WHATSAPP_CONFIG.dailyNumbers[adminIndex];
+    
+    // Debug log
+    console.log('WhatsApp Numara Debug:', {
+        dayOfWeek: dayOfWeek,
+        adminIndex: adminIndex,
+        hour: hour,
+        dayNumber: dayNumber,
+        isDayTime: hour >= 9 && hour < 18
+    });
+    
+    // Eğer numara yoksa varsayılan numara kullan
+    if (!dayNumber) {
+        console.warn(`Gün ${dayOfWeek} (admin index: ${adminIndex}) için numara bulunamadı, varsayılan numara kullanılıyor`);
+        return '905555555550';
+    }
     
     // 09:00-18:00 arası gündüz numarası, diğer saatler gece numarası
     if (hour >= 9 && hour < 18) {
-        return dayNumber.morning;
+        return dayNumber.morning || dayNumber.evening || '905555555550';
     } else {
-        return dayNumber.evening;
+        return dayNumber.evening || dayNumber.morning || '905555555550';
     }
 }
 
@@ -73,8 +96,21 @@ function openWhatsApp(type = 'contact') {
     const number = getWhatsAppNumber();
     const message = WHATSAPP_CONFIG.messages[type] || WHATSAPP_CONFIG.messages.contact;
     
+    // Numarayı temizle (sadece rakamları al)
+    const cleanNumber = number.replace(/\D/g, '');
+    
     // WhatsApp URL'sini oluştur
-    const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+    
+    // Debug: URL'yi konsola yazdır
+    console.log('WhatsApp Debug:', {
+        type: type,
+        originalNumber: number,
+        cleanNumber: cleanNumber,
+        message: message,
+        url: whatsappUrl,
+        config: WHATSAPP_CONFIG
+    });
     
     // Yeni sekmede WhatsApp'ı aç
     window.open(whatsappUrl, '_blank');
@@ -83,6 +119,7 @@ function openWhatsApp(type = 'contact') {
     console.log(`WhatsApp açıldı:`, {
         type: type,
         number: number,
+        cleanNumber: cleanNumber,
         message: message,
         url: whatsappUrl
     });
@@ -114,15 +151,23 @@ function showLoginModal() {
             }
         });
         
-        // Enter tuşu ile giriş
+        // Enter tuşu ile giriş - her input için ayrı event listener
         const handleEnterKey = function(e) {
             if (e.key === 'Enter') {
+                e.preventDefault(); // Form submit'i engelle
                 loginAdmin();
             }
         };
         
-        if (usernameInput) usernameInput.addEventListener('keypress', handleEnterKey);
-        if (passwordInput) passwordInput.addEventListener('keypress', handleEnterKey);
+        // Önceki event listener'ları temizle
+        if (usernameInput) {
+            usernameInput.removeEventListener('keypress', handleEnterKey);
+            usernameInput.addEventListener('keypress', handleEnterKey);
+        }
+        if (passwordInput) {
+            passwordInput.removeEventListener('keypress', handleEnterKey);
+            passwordInput.addEventListener('keypress', handleEnterKey);
+        }
     }
 }
 
@@ -142,8 +187,17 @@ function hideLoginModal() {
 }
 
 function loginAdmin() {
-    const username = document.getElementById('admin-username').value;
-    const password = document.getElementById('admin-password').value;
+    // Form değerlerini doğrudan al
+    const usernameInput = document.getElementById('admin-username');
+    const passwordInput = document.getElementById('admin-password');
+    
+    if (!usernameInput || !passwordInput) {
+        showNotification('Form alanları bulunamadı!', 'error');
+        return;
+    }
+    
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
     
     console.log('Login attempt:', {
         username: username,
@@ -197,11 +251,9 @@ function loginAdmin() {
             passwordMatch: password === WHATSAPP_CONFIG.adminSettings.password
         });
         
-        const passwordInput = document.getElementById('admin-password');
-        if (passwordInput) {
-            passwordInput.value = '';
-            passwordInput.focus();
-        }
+        // Şifre alanını temizle ve focus'u ayarla
+        passwordInput.value = '';
+        passwordInput.focus();
     }
 }
 
@@ -234,6 +286,222 @@ function logoutAdmin() {
     }
 }
 
+// ===== CONTENT MANAGEMENT =====
+function loadContentFromAdmin() {
+    const savedContent = localStorage.getItem('admin_content');
+    if (savedContent) {
+        try {
+            const content = JSON.parse(savedContent);
+        
+        // Update hero content
+        if (content['hero-title-1']) {
+            const titleLines = document.querySelectorAll('.hero-title .title-line');
+            if (titleLines.length >= 3) {
+                titleLines[0].textContent = content['hero-title-1'];
+                titleLines[1].textContent = content['hero-title-2'];
+                titleLines[2].textContent = content['hero-title-3'];
+            }
+        }
+        
+        if (content['hero-subtitle']) {
+            const subtitle = document.querySelector('.hero-subtitle');
+            if (subtitle) subtitle.textContent = content['hero-subtitle'];
+        }
+        
+        if (content['hero-cta-text']) {
+            const ctaButton = document.querySelector('.cta-button span:first-child');
+            if (ctaButton) ctaButton.textContent = content['hero-cta-text'];
+        }
+        
+        // Update about content
+        if (content['vision-title']) {
+            const visionTitle = document.querySelector('.vision-card h3');
+            if (visionTitle) visionTitle.textContent = content['vision-title'];
+        }
+        
+        if (content['vision-description']) {
+            const visionDesc = document.querySelector('.vision-card p');
+            if (visionDesc) visionDesc.textContent = content['vision-description'];
+        }
+        
+        if (content['mission-title']) {
+            const missionTitle = document.querySelector('.mission-card h3');
+            if (missionTitle) missionTitle.textContent = content['mission-title'];
+        }
+        
+        if (content['mission-description']) {
+            const missionDesc = document.querySelector('.mission-card p');
+            if (missionDesc) missionDesc.textContent = content['mission-description'];
+        }
+        
+        // Update services content
+        if (content['services-title']) {
+            const servicesTitle = document.querySelector('.services .section-title');
+            if (servicesTitle) servicesTitle.textContent = content['services-title'];
+        }
+        
+        if (content['services-subtitle']) {
+            const servicesSubtitle = document.querySelector('.services .section-subtitle');
+            if (servicesSubtitle) servicesSubtitle.textContent = content['services-subtitle'];
+        }
+        
+        if (content['visa-title']) {
+            const visaTitle = document.querySelector('.visa-service h3');
+            if (visaTitle) visaTitle.textContent = content['visa-title'];
+        }
+        
+        if (content['visa-description']) {
+            const visaDesc = document.querySelector('.visa-service .service-description');
+            if (visaDesc) visaDesc.textContent = content['visa-description'];
+        }
+        
+        if (content['ticketing-title']) {
+            const ticketingTitle = document.querySelector('.ticketing-service h3');
+            if (ticketingTitle) ticketingTitle.textContent = content['ticketing-title'];
+        }
+        
+        if (content['ticketing-description']) {
+            const ticketingDesc = document.querySelector('.ticketing-service .service-description');
+            if (ticketingDesc) ticketingDesc.textContent = content['ticketing-description'];
+        }
+        
+        // Update contact content
+        if (content['contact-title']) {
+            const contactTitle = document.querySelector('.contact .section-title');
+            if (contactTitle) contactTitle.textContent = content['contact-title'];
+        }
+        
+        if (content['contact-subtitle']) {
+            const contactSubtitle = document.querySelector('.contact .section-subtitle');
+            if (contactSubtitle) contactSubtitle.textContent = content['contact-subtitle'];
+        }
+        
+        if (content['contact-address']) {
+            const address = document.querySelector('.contact address');
+            if (address) address.textContent = content['contact-address'];
+        }
+        
+        if (content['contact-phone']) {
+            const phone = document.querySelector('.contact a[href^="tel:"]');
+            if (phone) {
+                phone.textContent = content['contact-phone'];
+                phone.href = `tel:${content['contact-phone']}`;
+            }
+        }
+        
+        if (content['contact-email']) {
+            const email = document.querySelector('.contact a[href^="mailto:"]');
+            if (email) {
+                email.textContent = content['contact-email'];
+                email.href = `mailto:${content['contact-email']}`;
+            }
+        }
+        
+        // Update footer content
+        if (content['footer-description']) {
+            const footerDesc = document.querySelector('.footer-description');
+            if (footerDesc) footerDesc.textContent = content['footer-description'];
+        }
+        
+        if (content['footer-copyright']) {
+            const copyright = document.querySelector('.footer-copyright p');
+            if (copyright) copyright.textContent = content['footer-copyright'];
+        }
+        } catch (e) {
+            console.error('İçerik yükleme hatası:', e);
+        }
+    }
+}
+
+function loadImagesFromAdmin() {
+    const savedImages = localStorage.getItem('admin_images');
+    if (savedImages) {
+        try {
+            const images = JSON.parse(savedImages);
+        
+        // Update hero images
+        if (images['hero-image-1']) {
+            const heroSlide1 = document.querySelector('.hero-slide:nth-child(1) img');
+            if (heroSlide1) heroSlide1.src = images['hero-image-1'];
+        }
+        
+        if (images['hero-image-2']) {
+            const heroSlide2 = document.querySelector('.hero-slide:nth-child(2) img');
+            if (heroSlide2) heroSlide2.src = images['hero-image-2'];
+        }
+        
+        if (images['hero-image-3']) {
+            const heroSlide3 = document.querySelector('.hero-slide:nth-child(3) img');
+            if (heroSlide3) heroSlide3.src = images['hero-image-3'];
+        }
+        
+        if (images['hero-image-4']) {
+            const heroSlide4 = document.querySelector('.hero-slide:nth-child(4) img');
+            if (heroSlide4) heroSlide4.src = images['hero-image-4'];
+        }
+        
+        if (images['hero-image-5']) {
+            const heroSlide5 = document.querySelector('.hero-slide:nth-child(5) img');
+            if (heroSlide5) heroSlide5.src = images['hero-image-5'];
+        }
+        
+
+        
+        // Update partner logos
+        if (images['partner-thy']) {
+            const thyLogos = document.querySelectorAll('.partner-logo img[src*="thy_logo"]');
+            thyLogos.forEach(logo => {
+                logo.src = images['partner-thy'];
+            });
+        }
+        
+        if (images['partner-turmed']) {
+            const turmedLogos = document.querySelectorAll('.partner-logo img[src*="turmed-logo"]');
+            turmedLogos.forEach(logo => {
+                logo.src = images['partner-turmed'];
+            });
+        }
+        
+        if (images['partner-paribu']) {
+            const paribuLogos = document.querySelectorAll('.partner-logo img[src*="paribu_logo"]');
+            paribuLogos.forEach(logo => {
+                logo.src = images['partner-paribu'];
+            });
+        }
+        
+        if (images['partner-papara']) {
+            const paparaLogos = document.querySelectorAll('.partner-logo img[src*="Papara_Logo"]');
+            paparaLogos.forEach(logo => {
+                logo.src = images['partner-papara'];
+            });
+        }
+        
+        if (images['partner-okx']) {
+            const okxLogos = document.querySelectorAll('.partner-logo img[src*="OKX_logo"]');
+            okxLogos.forEach(logo => {
+                logo.src = images['partner-okx'];
+            });
+        }
+        
+        if (images['partner-architect']) {
+            const architectLogos = document.querySelectorAll('.partner-logo img[src*="logo-architecht"]');
+            architectLogos.forEach(logo => {
+                logo.src = images['partner-architect'];
+            });
+        }
+        
+        if (images['partner-gamak']) {
+            const gamakLogos = document.querySelectorAll('.partner-logo img[src*="gamak_logo"]');
+            gamakLogos.forEach(logo => {
+                logo.src = images['partner-gamak'];
+            });
+        }
+        } catch (e) {
+            console.error('Görsel yükleme hatası:', e);
+        }
+    }
+}
+
 // ===== INITIALIZATION =====
 function initializeWhatsApp() {
     // WhatsApp butonlarına hover efekti ekle
@@ -257,6 +525,15 @@ function initializeWhatsApp() {
         });
     }
     
+    // Login butonuna tıklama olayı ekle
+    const loginButton = document.querySelector('.login-submit');
+    if (loginButton) {
+        loginButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginAdmin();
+        });
+    }
+    
     // Modal dışına tıklayınca kapatma
     const modal = document.getElementById('admin-login-modal');
     if (modal) {
@@ -269,8 +546,12 @@ function initializeWhatsApp() {
     
     // Enter tuşu ile giriş yapma
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && modal && modal.style.display === 'flex') {
-            loginAdmin();
+        if (e.key === 'Enter') {
+            const modal = document.getElementById('admin-login-modal');
+            if (modal && modal.style.display === 'flex') {
+                e.preventDefault(); // Form submit'i engelle
+                loginAdmin();
+            }
         }
     });
     
@@ -292,6 +573,10 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeApp() {
     // Preloader
     handlePreloader();
+    
+    // Load admin content and images
+    loadContentFromAdmin();
+    loadImagesFromAdmin();
     
     // Navbar scroll effect
     handleNavbarScroll();
@@ -967,3 +1252,271 @@ function initializeAnalytics() {
         });
     });
 } 
+
+// ===== SECURITY MEASURES =====
+// Disable F12, Ctrl+Shift+I, Ctrl+U, Ctrl+Shift+C
+document.addEventListener('keydown', function(e) {
+    // F12 key
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+Shift+I (Developer Tools)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+U (View Source)
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+Shift+C (Inspect Element)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+Shift+J (Console)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+        e.preventDefault();
+        return false;
+    }
+    
+    // Ctrl+S (Save Page)
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable right-click context menu
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Disable text selection
+document.addEventListener('selectstart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Disable drag and drop
+document.addEventListener('dragstart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Disable copy
+document.addEventListener('copy', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Disable cut
+document.addEventListener('cut', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Disable paste
+document.addEventListener('paste', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Console warning and detection
+(function() {
+    // Override console methods
+    const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        info: console.info,
+        debug: console.debug
+    };
+    
+    // Clear console
+    console.clear();
+    
+    // Show warning message
+    console.log('%c⚠️ UYARI ⚠️', 'color: red; font-size: 20px; font-weight: bold;');
+    console.log('%cBu site güvenlik nedeniyle korunmaktadır.', 'color: #333; font-size: 14px;');
+    console.log('%cBu alan sadece geliştiriciler içindir.', 'color: #666; font-size: 12px;');
+    
+    // Detect if console is opened
+    let devtools = { open: false, orientation: null };
+    
+    setInterval(() => {
+        const threshold = 160;
+        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        
+        if (widthThreshold || heightThreshold) {
+            if (!devtools.open) {
+                devtools.open = true;
+                // Redirect or show warning
+                document.body.innerHTML = '<div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;"><h1>⚠️ Güvenlik Uyarısı</h1><p>Bu site güvenlik nedeniyle korunmaktadır.</p></div>';
+            }
+        } else {
+            devtools.open = false;
+        }
+    }, 500);
+    
+    // Override console methods to prevent debugging
+    console.log = function() {};
+    console.warn = function() {};
+    console.error = function() {};
+    console.info = function() {};
+    console.debug = function() {};
+})();
+
+// Disable view source
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable save page
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable print screen
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable F5 refresh
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F5') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable Ctrl+R refresh
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 'r' || e.key === 'R')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable backspace navigation
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable tab navigation for security
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable function keys
+document.addEventListener('keydown', function(e) {
+    if (e.keyCode >= 112 && e.keyCode <= 123) { // F1-F12
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable Alt key combinations
+document.addEventListener('keydown', function(e) {
+    if (e.altKey) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable Ctrl key combinations (except admin panel)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && !e.target.closest('#admin-login-modal') && !e.target.closest('.admin-section')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable mouse wheel for zoom
+document.addEventListener('wheel', function(e) {
+    if (e.ctrlKey) {
+        e.preventDefault();
+        return false;
+    }
+}, { passive: false });
+
+// Disable pinch zoom on mobile
+document.addEventListener('gesturestart', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+document.addEventListener('gesturechange', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+document.addEventListener('gestureend', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+// Disable double tap zoom on mobile
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Disable text selection globally
+document.body.style.userSelect = 'none';
+document.body.style.webkitUserSelect = 'none';
+document.body.style.mozUserSelect = 'none';
+document.body.style.msUserSelect = 'none';
+
+// Disable images context menu
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    });
+});
+
+// Disable iframe access
+if (window.top !== window.self) {
+    window.top.location = window.self.location;
+}
+
+// Disable web inspector
+setInterval(() => {
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100) {
+        document.body.innerHTML = '<div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;"><h1>⚠️ Güvenlik Uyarısı</h1><p>Bu site güvenlik nedeniyle korunmaktadır.</p></div>';
+    }
+}, 1000); 

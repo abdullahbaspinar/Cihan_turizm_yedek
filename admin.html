@@ -2,24 +2,29 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Yönetim Paneli - Cihanturizm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+    <meta name="googlebot" content="noindex, nofollow">
+    <meta name="bingbot" content="noindex, nofollow">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
+    <meta name="referrer" content="no-referrer">
+    <title>Admin Panel - Cihanturizm</title>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/ercihanlogo-transparent.png">
     
     <!-- Session Protection Script -->
     <script>
-        // Sayfa yüklenmeden önce session kontrolü
         (function() {
             const sessionData = localStorage.getItem('admin_session');
             if (!sessionData) {
-                // Session yoksa ana sayfaya yönlendir
                 window.location.href = 'index.html';
                 return;
             }
@@ -28,7 +33,6 @@
             const now = Date.now();
             
             if (!session.loggedIn || now >= session.expires) {
-                // Session geçersiz veya süresi dolmuş
                 localStorage.removeItem('admin_session');
                 window.location.href = 'index.html';
                 return;
@@ -37,41 +41,86 @@
     </script>
 </head>
 <body>
-    <!-- Admin Header -->
-    <header class="admin-header">
-        <div class="admin-header-content">
-            <div class="admin-logo">
-                <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image">
-                <span class="admin-title">WhatsApp Yönetim Paneli</span>
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="sidebar-header">
+            <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="sidebar-logo">
+            <h3>Admin Panel</h3>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <span class="material-icons">menu</span>
+            </button>
             </div>
             
-            <div class="admin-user-info">
-                <span class="user-name">Hoş geldiniz, Admin</span>
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                <span class="material-icons">dashboard</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#content" class="nav-item" data-section="content">
+                <span class="material-icons">edit</span>
+                <span>İçerik Yönetimi</span>
+            </a>
+            <a href="#images" class="nav-item" data-section="images">
+                <span class="material-icons">image</span>
+                <span>Görsel Yönetimi</span>
+            </a>
+            <a href="#whatsapp" class="nav-item" data-section="whatsapp">
+                <span class="material-icons">phone</span>
+                <span>WhatsApp Ayarları</span>
+            </a>
+            <a href="#settings" class="nav-item" data-section="settings">
+                <span class="material-icons">settings</span>
+                <span>Genel Ayarlar</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
                 <button class="logout-btn" onclick="logoutAdmin()">
                     <span class="material-icons">logout</span>
                     <span>Çıkış Yap</span>
                 </button>
             </div>
-        </div>
-    </header>
+    </aside>
 
     <!-- Admin Main Content -->
     <main class="admin-main">
-        <div class="admin-container">
-            <!-- Dashboard Overview -->
-            <section class="admin-section">
-                <h2>
-                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">dashboard</span>
-                    Dashboard
-                </h2>
+        <header class="admin-header">
+            <div class="header-content">
+                <h1 id="section-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="save-all-btn" onclick="saveAllChanges()">
+                        <span class="material-icons">save</span>
+                        Tüm Değişiklikleri Kaydet
+                    </button>
+                    <a href="index.html" class="view-site-btn">
+                        <span class="material-icons">visibility</span>
+                        Siteyi Görüntüle
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
                 <div class="dashboard-grid">
                     <div class="dashboard-card">
                         <div class="card-icon">
-                            <span class="material-icons">phone</span>
+                            <span class="material-icons">edit</span>
                         </div>
                         <div class="card-content">
-                            <h3>Mevcut WhatsApp Numarası</h3>
-                            <p id="current-whatsapp-number">Yükleniyor...</p>
+                            <h3>Düzenlenen İçerikler</h3>
+                            <p id="edited-content-count">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <span class="material-icons">image</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Değiştirilen Görseller</h3>
+                            <p id="changed-images-count">0</p>
                         </div>
                     </div>
                     
@@ -81,493 +130,575 @@
                         </div>
                         <div class="card-content">
                             <h3>Son Güncelleme</h3>
-                            <p id="last-update">Yükleniyor...</p>
+                            <p id="last-update-time">-</p>
                         </div>
                     </div>
                     
                     <div class="dashboard-card">
                         <div class="card-icon">
-                            <span class="material-icons">today</span>
+                            <span class="material-icons">phone</span>
                         </div>
                         <div class="card-content">
-                            <h3>Bugün</h3>
-                            <p id="current-day">Yükleniyor...</p>
-                        </div>
-                    </div>
-                    
-                    <div class="dashboard-card">
-                        <div class="card-icon">
-                            <span class="material-icons">access_time</span>
-                        </div>
-                        <div class="card-content">
-                            <h3>Saat</h3>
-                            <p id="current-time">Yükleniyor...</p>
+                            <h3>Aktif WhatsApp</h3>
+                            <p id="current-whatsapp">-</p>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- WhatsApp Number Management -->
-            <section class="admin-section">
-                <h2>
-                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">settings_phone</span>
-                    WhatsApp Numarası Yönetimi
-                </h2>
                 
-                <div class="number-management">
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Pazartesi Günü Numaraları
-                        </h3>
-                        <p>Pazartesi günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="pazartesi-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="pazartesi-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(1)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Salı Günü Numaraları
-                        </h3>
-                        <p>Salı günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="sali-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="sali-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(2)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Çarşamba Günü Numaraları
-                        </h3>
-                        <p>Çarşamba günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="carsamba-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="carsamba-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(3)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Perşembe Günü Numaraları
-                        </h3>
-                        <p>Perşembe günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="persembe-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="persembe-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(4)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Cuma Günü Numaraları
-                        </h3>
-                        <p>Cuma günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="cuma-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="cuma-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(5)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Cumartesi Günü Numaraları
-                        </h3>
-                        <p>Cumartesi günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="cumartesi-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="cumartesi-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(6)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="number-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">wb_sunny</span>
-                            Pazar Günü Numaraları
-                        </h3>
-                        <p>Pazar günü için sabah (09:00-18:00) ve akşam (18:00-09:00) numaraları.</p>
-                        <div class="input-group">
-                            <div class="input-field">
-                                <label class="time-label">Sabah (09:00-18:00)</label>
-                                <input type="text" id="pazar-morning" placeholder="Sabah numarası" value="">
-                            </div>
-                            <div class="input-field">
-                                <label class="time-label">Akşam (18:00-09:00)</label>
-                                <input type="text" id="pazar-evening" placeholder="Akşam numarası" value="">
-                            </div>
-                            <button onclick="updateDayNumbers(0)" class="update-btn">
-                                <span class="material-icons">save</span>
-                                Güncelle
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Message Management -->
-            <section class="admin-section">
-                <h2>
-                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">message</span>
-                    WhatsApp Mesaj Yönetimi
-                </h2>
-                
-                <div class="message-management">
-                    <div class="message-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">chat_bubble</span>
-                            Bölüm Bazlı Mesajlar
-                        </h3>
-                        <p>Her bölüm için farklı WhatsApp mesajları ayarlayabilirsiniz.</p>
-                        
-                        <div class="message-inputs">
-                            <div class="message-input">
-                                <label>
-                                    <span class="material-icons" style="margin-right: 5px; font-size: 16px; color: #0D47A1;">security</span>
-                                    Vize Danışmanlığı Mesajı:
-                                </label>
-                                <textarea id="visa-message" rows="3" placeholder="Merhaba! Vize danışmanlığı hizmetleri hakkında bilgi almak istiyorum."></textarea>
-                            </div>
-                            
-                            <div class="message-input">
-                                <label>
-                                    <span class="material-icons" style="margin-right: 5px; font-size: 16px; color: #0D47A1;">flight</span>
-                                    Biletleme Hizmetleri Mesajı:
-                                </label>
-                                <textarea id="ticketing-message" rows="3" placeholder="Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum."></textarea>
-                            </div>
-                            
-                            <div class="message-input">
-                                <label>
-                                    <span class="material-icons" style="margin-right: 5px; font-size: 16px; color: #0D47A1;">contact_support</span>
-                                    İletişim Sayfası Mesajı:
-                                </label>
-                                <textarea id="contact-message" rows="3" placeholder="Merhaba! Cihanturizm ile iletişime geçmek istiyorum."></textarea>
-                            </div>
-                        </div>
-                        
-                        <button onclick="updateMessages()" class="update-btn">
-                            <span class="material-icons">save</span>
-                            Mesajları Güncelle
+                <div class="quick-actions">
+                    <h3>Hızlı İşlemler</h3>
+                    <div class="actions-grid">
+                        <button class="action-btn" onclick="showContentEditor()">
+                            <span class="material-icons">edit</span>
+                            İçerik Düzenle
+                        </button>
+                        <button class="action-btn" onclick="showImageManager()">
+                            <span class="material-icons">image</span>
+                            Görsel Yönet
+                        </button>
+                        <button class="action-btn" onclick="showWhatsAppSettings()">
+                            <span class="material-icons">phone</span>
+                            WhatsApp Ayarla
+                        </button>
+                        <button class="action-btn" onclick="previewChanges()">
+                            <span class="material-icons">preview</span>
+                            Değişiklikleri Önizle
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- Settings -->
-            <section class="admin-section">
-                <h2>
-                    <span class="material-icons" style="margin-right: 10px; color: #0D47A1;">settings</span>
-                    Ayarlar
-                </h2>
+            <!-- Content Management Section -->
+            <section id="content" class="content-section">
+                <div class="section-header">
+                    <h2>İçerik Yönetimi</h2>
+                    <p>Web sitesindeki tüm metinleri düzenleyebilirsiniz</p>
+                </div>
                 
-                <div class="settings-grid">
+                <div class="content-editor">
+                    <div class="editor-tabs">
+                        <button class="tab-btn active" data-tab="hero">Ana Sayfa</button>
+                        <button class="tab-btn" data-tab="about">Hakkımızda</button>
+                        <button class="tab-btn" data-tab="services">Hizmetler</button>
+                        <button class="tab-btn" data-tab="contact">İletişim</button>
+                        <button class="tab-btn" data-tab="footer">Footer</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="hero-tab">
+                        <div class="form-group">
+                            <label>Ana Başlık (1. Satır)</label>
+                            <input type="text" id="hero-title-1" placeholder="Markanızı">
+                        </div>
+                        <div class="form-group">
+                            <label>Ana Başlık (2. Satır)</label>
+                            <input type="text" id="hero-title-2" placeholder="Geleceğe">
+                        </div>
+                        <div class="form-group">
+                            <label>Ana Başlık (3. Satır)</label>
+                            <input type="text" id="hero-title-3" placeholder="Taşıyoruz">
+                            </div>
+                        <div class="form-group">
+                            <label>Alt Başlık</label>
+                            <textarea id="hero-subtitle" rows="3" placeholder="Profesyonel vize danışmanlığı ve biletleme hizmetleri ile seyahat deneyiminizi mükemmelleştirin"></textarea>
+                            </div>
+                        <div class="form-group">
+                            <label>CTA Buton Metni</label>
+                            <input type="text" id="hero-cta-text" placeholder="Hizmetleri Keşfet">
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="about-tab">
+                        <div class="form-group">
+                            <label>Vizyon Başlığı</label>
+                            <input type="text" id="vision-title" placeholder="Vizyonumuz">
+                        </div>
+                        <div class="form-group">
+                            <label>Vizyon Açıklaması</label>
+                            <textarea id="vision-description" rows="4" placeholder="Seyahat endüstrisinde teknoloji ve insan odaklı yaklaşımla öncü olmak, müşterilerimize en kaliteli hizmeti sunmak."></textarea>
+                            </div>
+                        <div class="form-group">
+                            <label>Misyon Başlığı</label>
+                            <input type="text" id="mission-title" placeholder="Misyonumuz">
+                            </div>
+                        <div class="form-group">
+                            <label>Misyon Açıklaması</label>
+                            <textarea id="mission-description" rows="4" placeholder="%98 başarı oranı ile vize danışmanlığı ve kapsamlı biletleme hizmetleri sunarak müşteri memnuniyetini en üst seviyede tutmak."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="services-tab">
+                        <div class="form-group">
+                            <label>Hizmetler Başlığı</label>
+                            <input type="text" id="services-title" placeholder="Ana Hizmetlerimiz">
+                        </div>
+                        <div class="form-group">
+                            <label>Hizmetler Alt Başlığı</label>
+                            <textarea id="services-subtitle" rows="2" placeholder="İki ana departmanımızla size kapsamlı seyahat çözümleri sunuyoruz"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Vize Danışmanlığı Başlığı</label>
+                            <input type="text" id="visa-title" placeholder="Vize Danışmanlığı">
+                        </div>
+                        <div class="form-group">
+                            <label>Vize Danışmanlığı Açıklaması</label>
+                            <textarea id="visa-description" rows="4" placeholder="Tüm ülkeler için profesyonel vize danışmanlığı hizmeti. Deneyimli ekibimizle başvuru sürecinizi kolaylaştırıyoruz."></textarea>
+                            </div>
+                        <div class="form-group">
+                            <label>Biletleme Başlığı</label>
+                            <input type="text" id="ticketing-title" placeholder="Biletleme Hizmetleri">
+                            </div>
+                        <div class="form-group">
+                            <label>Biletleme Açıklaması</label>
+                            <textarea id="ticketing-description" rows="4" placeholder="THY Corporate Club üyeliği ile uçak bileti, otel rezervasyonu ve araç kiralama hizmetlerinde anlık fiyat takibi."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="contact-tab">
+                        <div class="form-group">
+                            <label>İletişim Başlığı</label>
+                            <input type="text" id="contact-title" placeholder="İletişim">
+                        </div>
+                        <div class="form-group">
+                            <label>İletişim Alt Başlığı</label>
+                            <textarea id="contact-subtitle" rows="2" placeholder="Bizimle iletişime geçin, size yardımcı olalım"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Adres</label>
+                            <textarea id="contact-address" rows="3" placeholder="Halide Edip Adıvar Mah. Darülaceze Cd. No:19/4, Elmas Plaza, Şişli, Istanbul, Turkey 34382"></textarea>
+                            </div>
+                        <div class="form-group">
+                            <label>Telefon</label>
+                            <input type="text" id="contact-phone" placeholder="0212 506 57 74">
+                            </div>
+                        <div class="form-group">
+                            <label>E-posta</label>
+                            <input type="email" id="contact-email" placeholder="info@cihanturizm.com">
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="footer-tab">
+                        <div class="form-group">
+                            <label>Footer Açıklaması</label>
+                            <textarea id="footer-description" rows="3" placeholder="Profesyonel vize danışmanlığı ve biletleme hizmetleri ile seyahat deneyiminizi mükemmelleştiriyoruz."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Copyright Metni</label>
+                            <input type="text" id="footer-copyright" placeholder="© 2025 Cihanturizm. Tüm hakları saklıdır.">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Image Management Section -->
+            <section id="images" class="content-section">
+                <div class="section-header">
+                    <h2>Görsel Yönetimi</h2>
+                    <p>Web sitesindeki arka plan görsellerini değiştirebilirsiniz</p>
+                </div>
+                
+                <div class="image-manager">
+                    <div class="image-section">
+                        <h3>Ana Sayfa Arka Plan Görselleri</h3>
+                        <div class="image-grid">
+                            <div class="image-item">
+                                <label>Hero Görsel 1</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-1" src="assets/anasayfa/header-1.webp" alt="Hero 1">
+                                </div>
+                                <input type="file" id="hero-file-1" accept="image/*" onchange="previewImage(this, 'hero-image-1')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-1').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 2</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-2" src="assets/anasayfa/header-2.webp" alt="Hero 2">
+                                </div>
+                                <input type="file" id="hero-file-2" accept="image/*" onchange="previewImage(this, 'hero-image-2')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-2').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 3</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-3" src="assets/anasayfa/header-4.jpg" alt="Hero 3">
+                                </div>
+                                <input type="file" id="hero-file-3" accept="image/*" onchange="previewImage(this, 'hero-image-3')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-3').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 4</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-4" src="assets/anasayfa/header-5.jpg" alt="Hero 4">
+                                </div>
+                                <input type="file" id="hero-file-4" accept="image/*" onchange="previewImage(this, 'hero-image-4')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-4').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 5</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-5" src="assets/anasayfa/header-6.jpeg" alt="Hero 5">
+                                </div>
+                                <input type="file" id="hero-file-5" accept="image/*" onchange="previewImage(this, 'hero-image-5')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-5').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="image-section">
+                        <h3>Ana Sayfa Arka Plan Görselleri</h3>
+                        <p class="settings-info">Hero slider'da gösterilecek görselleri yönetin. Görsel sayısını artırıp azaltabilirsiniz.</p>
+                        <div class="image-controls">
+                            <button class="control-btn" onclick="addHeroImage()">
+                                <span class="material-icons">add</span>
+                                Görsel Ekle
+                            </button>
+                            <button class="control-btn danger" onclick="removeHeroImage()">
+                                <span class="material-icons">remove</span>
+                                Son Görseli Sil
+                            </button>
+                        </div>
+                        <div class="image-grid" id="hero-images-grid">
+                            <div class="image-item">
+                                <label>Hero Görsel 1</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-1" src="assets/anasayfa/header-1.webp" alt="Hero 1">
+                                </div>
+                                <input type="file" id="hero-file-1" accept="image/*" onchange="previewImage(this, 'hero-image-1')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-1').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 2</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-2" src="assets/anasayfa/header-2.webp" alt="Hero 2">
+                                </div>
+                                <input type="file" id="hero-file-2" accept="image/*" onchange="previewImage(this, 'hero-image-2')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-2').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 3</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-3" src="assets/anasayfa/header-4.jpg" alt="Hero 3">
+                                </div>
+                                <input type="file" id="hero-file-3" accept="image/*" onchange="previewImage(this, 'hero-image-3')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-3').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 4</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-4" src="assets/anasayfa/header-5.jpg" alt="Hero 4">
+                                </div>
+                                <input type="file" id="hero-file-4" accept="image/*" onchange="previewImage(this, 'hero-image-4')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-4').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Hero Görsel 5</label>
+                                <div class="image-preview">
+                                    <img id="hero-image-5" src="assets/anasayfa/header-6.jpeg" alt="Hero 5">
+                                </div>
+                                <input type="file" id="hero-file-5" accept="image/*" onchange="previewImage(this, 'hero-image-5')">
+                                <button class="upload-btn" onclick="document.getElementById('hero-file-5').click()">
+                                    <span class="material-icons">upload</span>
+                                    Görsel Yükle
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="image-section">
+                        <h3>Partner Logoları</h3>
+                        <p class="settings-info">Referanslar bölümündeki partner logolarını değiştirebilirsiniz. Önerilen boyut: 150x80px</p>
+                        <div class="image-grid">
+                            <div class="image-item">
+                                <label>Turkish Airlines Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-thy" src="assets/partners/thy_logo.png" alt="Turkish Airlines">
+                                </div>
+                                <input type="file" id="partner-thy-file" accept="image/*" onchange="previewImage(this, 'partner-thy')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-thy-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Turmed Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-turmed" src="assets/partners/turmed-logo.png" alt="Turmed">
+                                </div>
+                                <input type="file" id="partner-turmed-file" accept="image/*" onchange="previewImage(this, 'partner-turmed')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-turmed-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Paribu Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-paribu" src="assets/partners/paribu_logo.png" alt="Paribu">
+                                </div>
+                                <input type="file" id="partner-paribu-file" accept="image/*" onchange="previewImage(this, 'partner-paribu')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-paribu-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Papara Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-papara" src="assets/partners/Papara_Logo.png" alt="Papara">
+                                </div>
+                                <input type="file" id="partner-papara-file" accept="image/*" onchange="previewImage(this, 'partner-papara')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-papara-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>OKX Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-okx" src="assets/partners/OKX_logo.svg" alt="OKX">
+                                </div>
+                                <input type="file" id="partner-okx-file" accept="image/*" onchange="previewImage(this, 'partner-okx')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-okx-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Architect Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-architect" src="assets/partners/logo-architecht.png" alt="Architect">
+                                </div>
+                                <input type="file" id="partner-architect-file" accept="image/*" onchange="previewImage(this, 'partner-architect')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-architect-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                                </button>
+                            </div>
+                            
+                            <div class="image-item">
+                                <label>Gamak Logo</label>
+                                <div class="image-preview">
+                                    <img id="partner-gamak" src="assets/partners/gamak_logo.webp" alt="Gamak">
+                                </div>
+                                <input type="file" id="partner-gamak-file" accept="image/*" onchange="previewImage(this, 'partner-gamak')">
+                                <button class="upload-btn" onclick="document.getElementById('partner-gamak-file').click()">
+                                    <span class="material-icons">upload</span>
+                                    Logo Yükle
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- WhatsApp Settings Section -->
+            <section id="whatsapp" class="content-section">
+                <div class="section-header">
+                    <h2>WhatsApp Ayarları</h2>
+                    <p>WhatsApp numaralarını ve mesajlarını yönetin</p>
+                </div>
+                
+                <div class="whatsapp-settings">
+                    <div class="settings-grid">
+                        <div class="day-settings">
+                            <h3>Günlük Numaralar</h3>
+                            <p class="settings-info">Gece numaraları bir sonraki güne kadar geçerlidir. Örneğin: Pazartesi gecesi = Pazartesi 18:00 - Salı 09:00. Numaraları sadece rakam olarak girin (örn: 905555555550).</p>
+                            <div class="day-inputs">
+                                <div class="day-input">
+                                    <label>Pazartesi</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Pazartesi-Salı</span>
+                                    </div>
+                                    <input type="text" id="monday-morning" placeholder="Örn: 905555555550">
+                                    <input type="text" id="monday-evening" placeholder="Örn: 905555555551">
+                                </div>
+                                <div class="day-input">
+                                    <label>Salı</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Salı-Çarşamba</span>
+                                    </div>
+                                    <input type="text" id="tuesday-morning" placeholder="Örn: 905555555552">
+                                    <input type="text" id="tuesday-evening" placeholder="Örn: 905555555553">
+                                </div>
+                                <div class="day-input">
+                                    <label>Çarşamba</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Çarşamba-Perşembe</span>
+                                    </div>
+                                    <input type="text" id="wednesday-morning" placeholder="Örn: 905555555554">
+                                    <input type="text" id="wednesday-evening" placeholder="Örn: 905555555555">
+                                </div>
+                                <div class="day-input">
+                                    <label>Perşembe</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Perşembe-Cuma</span>
+                                    </div>
+                                    <input type="text" id="thursday-morning" placeholder="Örn: 905555555556">
+                                    <input type="text" id="thursday-evening" placeholder="Örn: 905555555557">
+                                </div>
+                                <div class="day-input">
+                                    <label>Cuma</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Cuma-Cumartesi</span>
+                                    </div>
+                                    <input type="text" id="friday-morning" placeholder="Örn: 905555555558">
+                                    <input type="text" id="friday-evening" placeholder="Örn: 905555555559">
+                                </div>
+                                <div class="day-input">
+                                    <label>Cumartesi</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Cumartesi-Pazar</span>
+                                    </div>
+                                    <input type="text" id="saturday-morning" placeholder="Örn: 905555555560">
+                                    <input type="text" id="saturday-evening" placeholder="Örn: 905555555561">
+                                </div>
+                                <div class="day-input">
+                                    <label>Pazar</label>
+                                    <div class="time-labels">
+                                        <span class="time-label">Sabah (09:00-18:00)</span>
+                                        <span class="time-label">Gece (18:00-09:00) - Pazar-Pazartesi</span>
+                                    </div>
+                                    <input type="text" id="sunday-morning" placeholder="Örn: 905555555562">
+                                    <input type="text" id="sunday-evening" placeholder="Örn: 905555555563">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message-settings">
+                            <h3>Mesaj Ayarları</h3>
+                        <div class="message-inputs">
+                            <div class="message-input">
+                                    <label>Vize Danışmanlığı Mesajı</label>
+                                <textarea id="visa-message" rows="3" placeholder="Merhaba! Vize danışmanlığı hizmetleri hakkında bilgi almak istiyorum."></textarea>
+                            </div>
+                            <div class="message-input">
+                                    <label>Biletleme Hizmetleri Mesajı</label>
+                                <textarea id="ticketing-message" rows="3" placeholder="Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum."></textarea>
+                                </div>
+                                <div class="message-input">
+                                    <label>İletişim Mesajı</label>
+                                    <textarea id="contact-message" rows="3" placeholder="Merhaba! Cihanturizm ile iletişime geçmek istiyorum."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="test-section">
+                                <h4>Test</h4>
+                                <button class="test-btn" onclick="testWhatsAppNumber()">
+                                    <span class="material-icons">phone</span>
+                                    Güncel WhatsApp Numarasını Test Et
+                                </button>
+                                <div id="test-result" class="test-result"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2>Genel Ayarlar</h2>
+                    <p>Sistem ayarlarını yönetin</p>
+                </div>
+                
+                <div class="settings-content">
                     <div class="setting-card">
-                        <h3>
-                            <span class="material-icons" style="margin-right: 8px; color: #0D47A1; font-size: 20px;">home</span>
-                            Ana Sayfaya Dön
-                        </h3>
-                        <p>Ana sayfaya geri dönmek için tıklayın.</p>
-                        <a href="index.html" class="home-btn">
-                            <span class="material-icons">home</span>
-                            Ana Sayfa
-                        </a>
+                        <h3>Site Ayarları</h3>
+                        <div class="form-group">
+                            <label>Site Başlığı</label>
+                            <input type="text" id="site-title" placeholder="Cihanturizm | Profesyonel Vize Danışmanlığı ve Biletleme Hizmetleri">
+                        </div>
+                        <div class="form-group">
+                            <label>Site Açıklaması</label>
+                            <textarea id="site-description" rows="3" placeholder="Cihanturizm ile %98 başarı oranı ile vize danışmanlığı, uçak bileti, otel rezervasyonu ve araç kiralama hizmetleri."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Admin Ayarları</h3>
+                        <div class="form-group">
+                            <label>Admin Kullanıcı Adı</label>
+                            <input type="text" id="admin-username" placeholder="admin">
+                        </div>
+                        <div class="form-group">
+                            <label>Admin Şifresi</label>
+                            <input type="password" id="admin-password" placeholder="cihan123">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Veri Yönetimi</h3>
+                        <div class="data-actions">
+                            <button class="action-btn" onclick="exportData()">
+                                <span class="material-icons">download</span>
+                                Verileri Dışa Aktar
+                            </button>
+                            <button class="action-btn" onclick="importData()">
+                                <span class="material-icons">upload</span>
+                                Verileri İçe Aktar
+                            </button>
+                            <button class="action-btn danger" onclick="resetData()">
+                                <span class="material-icons">delete</span>
+                                Tüm Verileri Sıfırla
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
         </div>
     </main>
 
-    <script src="script.js"></script>
-    <script>
-        // Admin sayfası için özel script
-        document.addEventListener('DOMContentLoaded', function() {
-            // Session kontrolü (ekstra güvenlik)
-            if (!checkAdminSession()) {
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Admin sayfası başlat
-            initializeAdminPage();
-            
-            // Sayfa animasyonları
-            addPageAnimations();
-        });
-        
-        function addPageAnimations() {
-            // Dashboard kartları için animasyon
-            const dashboardCards = document.querySelectorAll('.dashboard-card');
-            dashboardCards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 200);
-            });
-            
-            // Section'lar için animasyon
-            const sections = document.querySelectorAll('.admin-section');
-            sections.forEach((section, index) => {
-                section.style.opacity = '0';
-                section.style.transform = 'translateY(30px)';
-                
-                setTimeout(() => {
-                    section.style.transition = 'all 0.8s ease';
-                    section.style.opacity = '1';
-                    section.style.transform = 'translateY(0)';
-                }, (index + 2) * 300);
-            });
-        }
-        
-        function initializeAdminPage() {
-            // Dashboard verilerini yükle
-            loadDashboardData();
-            
-            // Form verilerini yükle
-            loadAdminFormData();
-            
-            // Her 30 saniyede bir güncelle
-            setInterval(loadDashboardData, 30000);
-        }
-        
-        function loadDashboardData() {
-            // Mevcut numarayı göster
-            const currentNumberElement = document.getElementById('current-whatsapp-number');
-            if (currentNumberElement) {
-                currentNumberElement.textContent = getWhatsAppNumber();
-                addPulseAnimation(currentNumberElement);
-            }
-            
-            // Son güncelleme zamanını göster
-            const lastUpdateElement = document.getElementById('last-update');
-            if (lastUpdateElement) {
-                lastUpdateElement.textContent = new Date().toLocaleString('tr-TR');
-            }
-            
-            // Bugünü göster
-            const currentDayElement = document.getElementById('current-day');
-            if (currentDayElement) {
-                const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
-                const today = new Date().getDay();
-                currentDayElement.textContent = days[today];
-            }
-            
-            // Saati göster
-            const currentTimeElement = document.getElementById('current-time');
-            if (currentTimeElement) {
-                currentTimeElement.textContent = new Date().toLocaleTimeString('tr-TR');
-            }
-        }
-        
-        function addPulseAnimation(element) {
-            element.style.animation = 'pulse 0.6s ease';
-            setTimeout(() => {
-                element.style.animation = '';
-            }, 600);
-        }
-        
-        function loadAdminFormData() {
-            // Günlere göre numaraları yükle (Pazartesi'den başlayıp Pazar'da bitiyor)
-            const dayNames = ['pazar', 'pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi'];
-            
-            dayNames.forEach((dayName, dayIndex) => {
-                const morningInput = document.getElementById(`${dayName}-morning`);
-                const eveningInput = document.getElementById(`${dayName}-evening`);
-                
-                if (morningInput && WHATSAPP_CONFIG.dailyNumbers[dayIndex]) {
-                    morningInput.value = WHATSAPP_CONFIG.dailyNumbers[dayIndex].morning || '';
-                }
-                if (eveningInput && WHATSAPP_CONFIG.dailyNumbers[dayIndex]) {
-                    eveningInput.value = WHATSAPP_CONFIG.dailyNumbers[dayIndex].evening || '';
-                }
-            });
-            
-            // Mesajları yükle
-            const messageInputs = {
-                'visa-message': WHATSAPP_CONFIG.messages.visa,
-                'ticketing-message': WHATSAPP_CONFIG.messages.ticketing,
-                'contact-message': WHATSAPP_CONFIG.messages.contact
-            };
-            
-            Object.keys(messageInputs).forEach(id => {
-                const textarea = document.getElementById(id);
-                if (textarea) {
-                    textarea.value = messageInputs[id];
-                }
-            });
-        }
-        
-        function updateDayNumbers(dayIndex) {
-            const dayNames = ['pazar', 'pazartesi', 'sali', 'carsamba', 'persembe', 'cuma', 'cumartesi'];
-            const dayName = dayNames[dayIndex];
-            
-            const morningInput = document.getElementById(`${dayName}-morning`);
-            const eveningInput = document.getElementById(`${dayName}-evening`);
-            
-            if (morningInput && eveningInput && morningInput.value.trim() && eveningInput.value.trim()) {
-                // WHATSAPP_CONFIG'i güncelle
-                if (!WHATSAPP_CONFIG.dailyNumbers[dayIndex]) {
-                    WHATSAPP_CONFIG.dailyNumbers[dayIndex] = {};
-                }
-                
-                WHATSAPP_CONFIG.dailyNumbers[dayIndex].morning = morningInput.value.trim();
-                WHATSAPP_CONFIG.dailyNumbers[dayIndex].evening = eveningInput.value.trim();
-                
-                // localStorage'a kaydet
-                localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
-                
-                showSuccessNotification(`${dayNames[dayIndex].charAt(0).toUpperCase() + dayNames[dayIndex].slice(1)} günü numaraları başarıyla güncellendi!`);
-                addPulseAnimation(morningInput);
-                addPulseAnimation(eveningInput);
-            } else {
-                showErrorNotification('Lütfen her iki numarayı da girin!');
-            }
-        }
-        
-        function updateMessages() {
-            const messageInputs = {
-                'visa-message': 'visa',
-                'ticketing-message': 'ticketing',
-                'contact-message': 'contact'
-            };
-            
-            let hasChanges = false;
-            
-            Object.keys(messageInputs).forEach(id => {
-                const textarea = document.getElementById(id);
-                if (textarea && textarea.value.trim()) {
-                    WHATSAPP_CONFIG.messages[messageInputs[id]] = textarea.value.trim();
-                    hasChanges = true;
-                }
-            });
-            
-            if (hasChanges) {
-                localStorage.setItem('whatsapp_config', JSON.stringify(WHATSAPP_CONFIG));
-                showSuccessNotification('Mesajlar başarıyla güncellendi!');
-            } else {
-                showErrorNotification('Lütfen en az bir mesaj girin!');
-            }
-        }
-        
-        function showSuccessNotification(message) {
-            showNotification(message, 'success');
-        }
-        
-        function showErrorNotification(message) {
-            showNotification(message, 'error');
-        }
-        
-        // Global fonksiyonları ekle
-        window.updateDayNumbers = updateDayNumbers;
-        window.updateMessages = updateMessages;
-    </script>
-    
-    <style>
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .admin-section {
-            animation: fadeInUp 0.8s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .dashboard-card {
-            animation: slideInUp 0.6s ease;
-        }
-        
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- File Input for Data Import -->
+    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="handleImportFile(this)">
+
+    <script src="admin.js"></script>
 </body>
 </html> 
