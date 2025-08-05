@@ -359,6 +359,31 @@ function saveAllChanges() {
     localStorage.setItem('admin_settings', JSON.stringify(settingsData));
     
     showNotification('Tüm değişiklikler başarıyla kaydedildi!', 'success');
+    
+    // Save to server for cross-device sync
+    fetch('admin/save.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            content: contentData,
+            images: imageData,
+            whatsapp: whatsappData
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === 'success') {
+            console.log('Sunucuya kaydedildi - Cross-device sync aktif');
+            showNotification('Değişiklikler tüm cihazlarda senkronize edildi!', 'success');
+        } else {
+            console.error('Sunucu kaydı başarısız:', res.message);
+            showNotification('Yerel kayıt başarılı, sunucu kaydı başarısız', 'warning');
+        }
+    })
+    .catch(error => {
+        console.error('Sunucu kaydı hatası:', error);
+        showNotification('Yerel kayıt başarılı, sunucu bağlantısı yok', 'warning');
+    });
     updateDashboard();
 }
 

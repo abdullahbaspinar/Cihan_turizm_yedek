@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="index, follow">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     
     <!-- Primary Meta Tags -->
     <title>Cihanturizm | Profesyonel Vize Danışmanlığı ve Biletleme Hizmetleri</title>
@@ -754,6 +757,148 @@
             </div>
         </div>
     </div>
+
+    <!-- Data Loading Script -->
+    <script>
+        // Load data from server for cross-device sync
+        fetch('/data/data.json?t=' + Date.now())
+            .then(res => res.json())
+            .then(data => {
+                console.log('Server data loaded:', data);
+                
+                // Update content if available
+                if (data.content) {
+                    // Hero content
+                    if (data.content['hero-title-1']) {
+                        const titleLines = document.querySelectorAll('.hero-title .title-line');
+                        if (titleLines.length >= 3) {
+                            titleLines[0].textContent = data.content['hero-title-1'];
+                            titleLines[1].textContent = data.content['hero-title-2'] || titleLines[1].textContent;
+                            titleLines[2].textContent = data.content['hero-title-3'] || titleLines[2].textContent;
+                        }
+                    }
+                    
+                    if (data.content['hero-subtitle']) {
+                        const subtitle = document.querySelector('.hero-subtitle');
+                        if (subtitle) subtitle.textContent = data.content['hero-subtitle'];
+                    }
+                    
+                    if (data.content['hero-cta-text']) {
+                        const ctaButton = document.querySelector('.cta-button span:first-child');
+                        if (ctaButton) ctaButton.textContent = data.content['hero-cta-text'];
+                    }
+                    
+                    // About content
+                    if (data.content['vision-title']) {
+                        const visionTitle = document.querySelector('.vision-card:first-child h3');
+                        if (visionTitle) visionTitle.textContent = data.content['vision-title'];
+                    }
+                    
+                    if (data.content['vision-description']) {
+                        const visionDesc = document.querySelector('.vision-card:first-child p');
+                        if (visionDesc) visionDesc.textContent = data.content['vision-description'];
+                    }
+                    
+                    if (data.content['mission-title']) {
+                        const missionTitle = document.querySelector('.vision-card:last-child h3');
+                        if (missionTitle) missionTitle.textContent = data.content['mission-title'];
+                    }
+                    
+                    if (data.content['mission-description']) {
+                        const missionDesc = document.querySelector('.vision-card:last-child p');
+                        if (missionDesc) missionDesc.textContent = data.content['mission-description'];
+                    }
+                    
+                    // Services content
+                    if (data.content['services-title']) {
+                        const servicesTitle = document.querySelector('.services .section-title');
+                        if (servicesTitle) servicesTitle.textContent = data.content['services-title'];
+                    }
+                    
+                    if (data.content['services-subtitle']) {
+                        const servicesSubtitle = document.querySelector('.services .section-subtitle');
+                        if (servicesSubtitle) servicesSubtitle.textContent = data.content['services-subtitle'];
+                    }
+                    
+                    if (data.content['visa-title']) {
+                        const visaTitle = document.querySelector('.service-card:nth-child(1) .service-header h3');
+                        if (visaTitle) visaTitle.textContent = data.content['visa-title'];
+                    }
+                    
+                    if (data.content['visa-description']) {
+                        const visaDesc = document.querySelector('.service-card:nth-child(1) .service-description');
+                        if (visaDesc) visaDesc.textContent = data.content['visa-description'];
+                    }
+                    
+                    if (data.content['ticketing-title']) {
+                        const ticketingTitle = document.querySelector('.service-card:nth-child(2) .service-header h3');
+                        if (ticketingTitle) ticketingTitle.textContent = data.content['ticketing-title'];
+                    }
+                    
+                    if (data.content['ticketing-description']) {
+                        const ticketingDesc = document.querySelector('.service-card:nth-child(2) .service-description');
+                        if (ticketingDesc) ticketingDesc.textContent = data.content['ticketing-description'];
+                    }
+                    
+                    // Contact content
+                    if (data.content['contact-title']) {
+                        const contactTitle = document.querySelector('.contact .section-title');
+                        if (contactTitle) contactTitle.textContent = data.content['contact-title'];
+                    }
+                    
+                    if (data.content['contact-subtitle']) {
+                        const contactSubtitle = document.querySelector('.contact .section-subtitle');
+                        if (contactSubtitle) contactSubtitle.textContent = data.content['contact-subtitle'];
+                    }
+                    
+                    if (data.content['contact-address']) {
+                        const contactAddress = document.querySelector('.info-item:nth-child(1) .info-content p');
+                        if (contactAddress) contactAddress.textContent = data.content['contact-address'];
+                    }
+                    
+                    if (data.content['contact-phone']) {
+                        const contactPhone = document.querySelector('.info-item:nth-child(2) .info-content p');
+                        if (contactPhone) contactPhone.textContent = data.content['contact-phone'];
+                    }
+                    
+                    if (data.content['contact-email']) {
+                        const contactEmail = document.querySelector('.info-item:nth-child(3) .info-content p');
+                        if (contactEmail) contactEmail.textContent = data.content['contact-email'];
+                    }
+                    
+                    // Footer content
+                    if (data.content['footer-description']) {
+                        const footerDesc = document.querySelector('.footer-description');
+                        if (footerDesc) footerDesc.textContent = data.content['footer-description'];
+                    }
+                    
+                    if (data.content['footer-copyright']) {
+                        const footerCopyright = document.querySelector('.footer-copyright p');
+                        if (footerCopyright) footerCopyright.textContent = data.content['footer-copyright'];
+                    }
+                }
+                
+                // Update images if available
+                if (data.images) {
+                    Object.keys(data.images).forEach(imageId => {
+                        const img = document.getElementById(imageId);
+                        if (img && data.images[imageId]) {
+                            img.src = data.images[imageId];
+                        }
+                    });
+                }
+                
+                // Update WhatsApp config if available
+                if (data.whatsapp) {
+                    // Store WhatsApp config for use in script.js
+                    localStorage.setItem('whatsapp_config', JSON.stringify(data.whatsapp));
+                    console.log('WhatsApp config updated from server');
+                }
+            })
+            .catch(error => {
+                console.log('Server data loading failed, using local data:', error);
+            });
+    </script>
 
     <!-- Optimized Scripts -->
     <script src="script.js" defer></script>
