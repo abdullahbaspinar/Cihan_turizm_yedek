@@ -1,31 +1,6 @@
 {
-  "content": {
-    "hero-title-1": "TEST BAŞLIK",
-    "hero-title-2": "TEST BAŞLIK 2", 
-    "hero-title-3": "TEST BAŞLIK 3",
-    "hero-subtitle": "Test alt başlık denemesi",
-    "hero-cta-text": "Test Hizmetleri",
-    "vision-title": "Test Vizyonumuz",
-    "vision-description": "Test vizyon açıklaması",
-    "mission-title": "Test Misyonumuz",
-    "mission-description": "Test misyon açıklaması",
-    "services-title": "Test Hizmetlerimiz",
-    "services-subtitle": "Test hizmet açıklaması",
-    "visa-title": "Test Vize Hizmeti",
-    "visa-description": "Test vize açıklaması",
-    "ticketing-title": "Test Biletleme",
-    "ticketing-description": "Test biletleme açıklaması",
-    "contact-title": "Test İletişim",
-    "contact-subtitle": "Test iletişim açıklaması",
-    "contact-address": "Test Adres",
-    "contact-phone": "Test Telefon",
-    "contact-email": "test@test.com",
-    "footer-description": "Test footer açıklaması",
-    "footer-copyright": "Test Copyright"
-  },
-  "images": {
-    "hero-image-1": "assets/anasayfa/header-1.webp"
-  },
+  "content": {},
+  "images": {},
   "whatsapp": {
     "dailyNumbers": [
       { "morning": "905321111111", "evening": "905321111112" },

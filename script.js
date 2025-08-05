@@ -1,3 +1,22 @@
+// ===== LOADING SCREEN =====
+function showPreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.style.display = 'flex';
+        preloader.style.opacity = '1';
+    }
+}
+
+function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+            preloader.style.display = 'none';
+        }, 300);
+    }
+}
+
 // ===== SECURITY MEASURES COMPLETELY REMOVED =====
 // All security measures have been completely removed for development purposes
 
@@ -72,34 +91,150 @@ function loadWhatsAppConfig() {
 }
 
 // ===== WHATSAPP FUNCTIONS =====
+
+// Test function to check WhatsApp configuration
+function testWhatsAppConfig() {
+    const whatsappData = localStorage.getItem('whatsapp_config');
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const hour = now.getHours();
+    
+    // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
+    let effectiveDayOfWeek = dayOfWeek;
+    let isNightTime = false;
+    
+    if (hour >= 18 || hour < 9) {
+        isNightTime = true;
+        // Gece saatlerinde bir önceki günün gece numarası kullanılır
+        if (hour >= 18) {
+            // 18:00'dan sonra aynı günün gece numarası
+            effectiveDayOfWeek = dayOfWeek;
+        } else {
+            // 09:00'dan önce bir önceki günün gece numarası
+            effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
+        }
+    }
+    
+    let adminIndex;
+    if (effectiveDayOfWeek === 0) {
+        adminIndex = 6;
+    } else {
+        adminIndex = effectiveDayOfWeek - 1;
+    }
+    
+    console.log('WhatsApp Config Test:', {
+        originalDayOfWeek: dayOfWeek,
+        effectiveDayOfWeek: effectiveDayOfWeek,
+        adminIndex: adminIndex,
+        hour: hour,
+        isNightTime: isNightTime,
+        isDayTime: hour >= 9 && hour < 18,
+        whatsappData: whatsappData,
+        currentNumber: getWhatsAppNumber()
+    });
+    
+    if (whatsappData) {
+        try {
+            const whatsapp = JSON.parse(whatsappData);
+            console.log('Parsed WhatsApp Data:', whatsapp);
+            
+            if (whatsapp.dailyNumbers) {
+                console.log('Daily Numbers:', whatsapp.dailyNumbers);
+                if (whatsapp.dailyNumbers[adminIndex]) {
+                    console.log('Current Day Data:', whatsapp.dailyNumbers[adminIndex]);
+                }
+            }
+            
+            // Test WhatsApp button functionality
+            const testNumber = getWhatsAppNumber();
+            const testMessage = WHATSAPP_CONFIG.messages.contact;
+            const cleanNumber = testNumber.replace(/\D/g, '');
+            const testUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(testMessage)}`;
+            
+            console.log('WhatsApp Button Test:', {
+                testNumber: testNumber,
+                cleanNumber: cleanNumber,
+                testMessage: testMessage,
+                testUrl: testUrl
+            });
+        } catch (e) {
+            console.error('Parse error:', e);
+        }
+    }
+}
+
 function getWhatsAppNumber() {
     const now = new Date();
     const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
     const hour = now.getHours();
     
-    // Admin panelindeki index'e çevir (0=Pazar -> 6, 1=Pazartesi -> 0, 2=Salı -> 1, ...)
-    let adminIndex;
-    if (dayOfWeek === 0) { // Pazar
-        adminIndex = 6;
-    } else {
-        adminIndex = dayOfWeek - 1; // Pazartesi=0, Salı=1, ...
+    // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
+    let effectiveDayOfWeek = dayOfWeek;
+    let isNightTime = false;
+    
+    if (hour >= 18 || hour < 9) {
+        isNightTime = true;
+        // Gece saatlerinde bir önceki günün gece numarası kullanılır
+        if (hour >= 18) {
+            // 18:00'dan sonra aynı günün gece numarası
+            effectiveDayOfWeek = dayOfWeek;
+        } else {
+            // 09:00'dan önce bir önceki günün gece numarası
+            effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
+        }
     }
     
-    // Günün numarasını al
-    const dayNumber = WHATSAPP_CONFIG.dailyNumbers[adminIndex];
+    // Admin panelindeki index'e çevir (0=Pazar -> 6, 1=Pazartesi -> 0, 2=Salı -> 1, ...)
+    let adminIndex;
+    if (effectiveDayOfWeek === 0) { // Pazar
+        adminIndex = 6;
+    } else {
+        adminIndex = effectiveDayOfWeek - 1; // Pazartesi=0, Salı=1, ...
+    }
+    
+    // Firebase'den gelen veriyi kontrol et
+    const whatsappData = localStorage.getItem('whatsapp_config');
+    let dayNumber = null;
+    
+    if (whatsappData) {
+        try {
+            const whatsapp = JSON.parse(whatsappData);
+            
+            // Firebase'den gelen veri yapısını kontrol et
+            if (whatsapp.dailyNumbers) {
+                // Array formatından object formatına çevir
+                if (Array.isArray(whatsapp.dailyNumbers)) {
+                    dayNumber = whatsapp.dailyNumbers[adminIndex];
+                } else {
+                    // Object formatında ise direkt kullan
+                    dayNumber = whatsapp.dailyNumbers[adminIndex];
+                }
+            }
+        } catch (e) {
+            console.error('WhatsApp config parse error:', e);
+        }
+    }
+    
+    // Eğer Firebase'den veri yoksa, varsayılan config'i kullan
+    if (!dayNumber) {
+        dayNumber = WHATSAPP_CONFIG.dailyNumbers[adminIndex];
+    }
     
     // Debug log
     console.log('WhatsApp Numara Debug:', {
-        dayOfWeek: dayOfWeek,
+        originalDayOfWeek: dayOfWeek,
+        effectiveDayOfWeek: effectiveDayOfWeek,
         adminIndex: adminIndex,
         hour: hour,
+        isNightTime: isNightTime,
         dayNumber: dayNumber,
-        isDayTime: hour >= 9 && hour < 18
+        isDayTime: hour >= 9 && hour < 18,
+        whatsappData: whatsappData
     });
     
     // Eğer numara yoksa varsayılan numara kullan
     if (!dayNumber) {
-        console.warn(`Gün ${dayOfWeek} (admin index: ${adminIndex}) için numara bulunamadı, varsayılan numara kullanılıyor`);
+        console.warn(`Gün ${effectiveDayOfWeek} (admin index: ${adminIndex}) için numara bulunamadı, varsayılan numara kullanılıyor`);
         return '905555555550';
     }
     
@@ -113,13 +248,34 @@ function getWhatsAppNumber() {
 
 function openWhatsApp(type = 'contact') {
     const number = getWhatsAppNumber();
-    const message = WHATSAPP_CONFIG.messages[type] || WHATSAPP_CONFIG.messages.contact;
+    
+    // Firebase'den gelen mesajları kontrol et
+    const whatsappData = localStorage.getItem('whatsapp_config');
+    let message = WHATSAPP_CONFIG.messages[type] || WHATSAPP_CONFIG.messages.contact;
+    
+    if (whatsappData) {
+        try {
+            const whatsapp = JSON.parse(whatsappData);
+            if (whatsapp.messages && whatsapp.messages[type]) {
+                message = whatsapp.messages[type];
+            }
+        } catch (e) {
+            console.error('WhatsApp messages parse error:', e);
+        }
+    }
     
     // Numarayı temizle (sadece rakamları al)
     const cleanNumber = number.replace(/\D/g, '');
     
     // WhatsApp URL'sini oluştur
     const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+    
+    // Update WhatsApp number element
+    const whatsappElement = document.getElementById('whatsapp-number');
+    if (whatsappElement) {
+        whatsappElement.href = whatsappUrl;
+        whatsappElement.textContent = `WhatsApp: +${number}`;
+    }
     
     // Debug: URL'yi konsola yazdır
     console.log('WhatsApp Debug:', {
@@ -128,7 +284,8 @@ function openWhatsApp(type = 'contact') {
         cleanNumber: cleanNumber,
         message: message,
         url: whatsappUrl,
-        config: WHATSAPP_CONFIG
+        config: WHATSAPP_CONFIG,
+        whatsappData: whatsappData
     });
     
     // Yeni sekmede WhatsApp'ı aç
@@ -516,26 +673,37 @@ function initializeWhatsApp() {
         }
     });
     
+    // Test WhatsApp configuration
+    testWhatsAppConfig();
+    
+    // Global function for WhatsApp buttons
+    window.openWhatsApp = openWhatsApp;
+    window.getWhatsAppNumber = getWhatsAppNumber;
+    window.testWhatsAppConfig = testWhatsAppConfig;
+    
     console.log('WhatsApp sistemi başlatıldı:', {
         currentNumber: getWhatsAppNumber(),
-        config: WHATSAPP_CONFIG
+        config: WHATSAPP_CONFIG,
+        firebaseData: localStorage.getItem('whatsapp_config')
     });
 }
 
 // ===== DOM CONTENT LOADED =====
 document.addEventListener('DOMContentLoaded', function() {
+    // Show preloader
+    showPreloader();
+    
     // WhatsApp config'ini yükle
     loadWhatsAppConfig();
     
     // Initialize app immediately
     initializeApp();
     
-    // Hide preloader if it exists
+    // Hide preloader when everything is loaded
     window.addEventListener('load', function() {
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            preloader.style.display = 'none';
-        }
+        setTimeout(() => {
+            hidePreloader();
+        }, 1000); // Show for at least 1 second
     });
 });
 
@@ -576,8 +744,8 @@ function initializeApp() {
     }
 }
 
-// ===== PRELOADER (REMOVED) =====
-// Preloader functionality removed to fix loading issues
+// ===== PRELOADER =====
+// Loading screen functionality restored
 
 // ===== NAVBAR SCROLL EFFECT =====
 function handleNavbarScroll() {

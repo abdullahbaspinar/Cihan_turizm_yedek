@@ -53,7 +53,7 @@
     <style>
         /* Critical CSS for above-the-fold content */
         body { margin: 0; font-family: 'Inter', sans-serif; }
-        .preloader { display: none; }
+        .preloader { display: flex; }
         .hero-section { min-height: 100vh; }
     </style>
     
@@ -144,12 +144,14 @@
     </script>
 </head>
 <body>
-    <!-- Optimized preloader - hidden by default -->
-    <div id="preloader" class="preloader" aria-hidden="true" style="display: none;">
+    <!-- Loading Screen -->
+    <div id="preloader" class="preloader" aria-hidden="true">
         <div class="preloader-content">
             <div class="preloader-logo">
                 <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image" loading="eager">
             </div>
+            <div class="preloader-spinner"></div>
+            <div class="preloader-text">Yükleniyor...</div>
         </div>
     </div>
 
@@ -573,9 +575,9 @@
                         </div>
                         <div class="info-content">
                             <h4>WhatsApp</h4>
-                            <button class="whatsapp-contact-btn" onclick="openWhatsApp('contact')" aria-label="WhatsApp ile iletişime geç">
+                            <a href="#" id="whatsapp-number" class="whatsapp-contact-btn" onclick="openWhatsApp('contact')" aria-label="WhatsApp ile iletişime geç">
                                 <span>WhatsApp'tan Yaz</span>
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -758,161 +760,148 @@
         </div>
     </div>
 
-    <!-- Data Loading Script -->
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
     <script>
-        // Load data from server for cross-device sync
-        fetch('/data/data.json?t=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                console.log('Server data loaded:', data);
-                
-                // Update content if available
-                if (data.content) {
-                    // Hero content - Using class selectors
-                    if (data.content['hero-title-1']) {
-                        const titleLines = document.querySelectorAll('.hero-title .title-line');
-                        if (titleLines.length >= 1) {
-                            titleLines[0].textContent = data.content['hero-title-1'];
-                        }
-                    }
-                    
-                    if (data.content['hero-title-2']) {
-                        const titleLines = document.querySelectorAll('.hero-title .title-line');
-                        if (titleLines.length >= 2) {
-                            titleLines[1].textContent = data.content['hero-title-2'];
-                        }
-                    }
-                    
-                    if (data.content['hero-title-3']) {
-                        const titleLines = document.querySelectorAll('.hero-title .title-line');
-                        if (titleLines.length >= 3) {
-                            titleLines[2].textContent = data.content['hero-title-3'];
-                        }
-                    }
-                    
-                    if (data.content['hero-subtitle']) {
-                        const subtitle = document.querySelector('.hero-subtitle');
-                        if (subtitle) subtitle.textContent = data.content['hero-subtitle'];
-                    }
-                    
-                    if (data.content['hero-cta-text']) {
-                        const ctaButton = document.querySelector('.cta-button span:first-child');
-                        if (ctaButton) ctaButton.textContent = data.content['hero-cta-text'];
-                    }
-                    
-                    // About content
-                    if (data.content['vision-title']) {
-                        const visionTitle = document.querySelector('.vision-card:first-child h3');
-                        if (visionTitle) visionTitle.textContent = data.content['vision-title'];
-                    }
-                    
-                    if (data.content['vision-description']) {
-                        const visionDesc = document.querySelector('.vision-card:first-child p');
-                        if (visionDesc) visionDesc.textContent = data.content['vision-description'];
-                    }
-                    
-                    if (data.content['mission-title']) {
-                        const missionTitle = document.querySelector('.vision-card:last-child h3');
-                        if (missionTitle) missionTitle.textContent = data.content['mission-title'];
-                    }
-                    
-                    if (data.content['mission-description']) {
-                        const missionDesc = document.querySelector('.vision-card:last-child p');
-                        if (missionDesc) missionDesc.textContent = data.content['mission-description'];
-                    }
-                    
-                    // Services content
-                    if (data.content['services-title']) {
-                        const servicesTitle = document.querySelector('.services .section-title');
-                        if (servicesTitle) servicesTitle.textContent = data.content['services-title'];
-                    }
-                    
-                    if (data.content['services-subtitle']) {
-                        const servicesSubtitle = document.querySelector('.services .section-subtitle');
-                        if (servicesSubtitle) servicesSubtitle.textContent = data.content['services-subtitle'];
-                    }
-                    
-                    if (data.content['visa-title']) {
-                        const visaTitle = document.querySelector('.service-card:nth-child(1) .service-header h3');
-                        if (visaTitle) visaTitle.textContent = data.content['visa-title'];
-                    }
-                    
-                    if (data.content['visa-description']) {
-                        const visaDesc = document.querySelector('.service-card:nth-child(1) .service-description');
-                        if (visaDesc) visaDesc.textContent = data.content['visa-description'];
-                    }
-                    
-                    if (data.content['ticketing-title']) {
-                        const ticketingTitle = document.querySelector('.service-card:nth-child(2) .service-header h3');
-                        if (ticketingTitle) ticketingTitle.textContent = data.content['ticketing-title'];
-                    }
-                    
-                    if (data.content['ticketing-description']) {
-                        const ticketingDesc = document.querySelector('.service-card:nth-child(2) .service-description');
-                        if (ticketingDesc) ticketingDesc.textContent = data.content['ticketing-description'];
-                    }
-                    
-                    // Contact content
-                    if (data.content['contact-title']) {
-                        const contactTitle = document.querySelector('.contact .section-title');
-                        if (contactTitle) contactTitle.textContent = data.content['contact-title'];
-                    }
-                    
-                    if (data.content['contact-subtitle']) {
-                        const contactSubtitle = document.querySelector('.contact .section-subtitle');
-                        if (contactSubtitle) contactSubtitle.textContent = data.content['contact-subtitle'];
-                    }
-                    
-                    if (data.content['contact-address']) {
-                        const contactAddress = document.querySelector('.info-item:nth-child(1) .info-content p');
-                        if (contactAddress) contactAddress.textContent = data.content['contact-address'];
-                    }
-                    
-                    if (data.content['contact-phone']) {
-                        const contactPhone = document.querySelector('.info-item:nth-child(2) .info-content p');
-                        if (contactPhone) contactPhone.textContent = data.content['contact-phone'];
-                    }
-                    
-                    if (data.content['contact-email']) {
-                        const contactEmail = document.querySelector('.info-item:nth-child(3) .info-content p');
-                        if (contactEmail) contactEmail.textContent = data.content['contact-email'];
-                    }
-                    
-                    // Footer content
-                    if (data.content['footer-description']) {
-                        const footerDesc = document.querySelector('.footer-description');
-                        if (footerDesc) footerDesc.textContent = data.content['footer-description'];
-                    }
-                    
-                    if (data.content['footer-copyright']) {
-                        const footerCopyright = document.querySelector('.footer-copyright p');
-                        if (footerCopyright) footerCopyright.textContent = data.content['footer-copyright'];
-                    }
-                }
-                
-                // Update images if available
-                if (data.images) {
-                    Object.keys(data.images).forEach(imageId => {
-                        const img = document.getElementById(imageId);
-                        if (img && data.images[imageId]) {
-                            img.src = data.images[imageId];
-                        }
-                    });
-                }
-                
-                // Update WhatsApp config if available
-                if (data.whatsapp) {
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyo2dgEsqLHaI6zFKl-NTOr0rOFwmcRJY",
+            authDomain: "cihan-turizm.firebaseapp.com",
+            databaseURL: "https://cihan-turizm-default-rtdb.firebaseio.com",
+            projectId: "cihan-turizm",
+            storageBucket: "cihan-turizm.appspot.com",
+            messagingSenderId: "590961604070",
+            appId: "1:590961604070:web:c1273b0ec4cb17d2bad227"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Load WhatsApp data from Firebase Realtime Database
+        database.ref('/whatsapp').once('value')
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    console.log('Firebase WhatsApp data loaded:', data);
                     // Store WhatsApp config for use in script.js
-                    localStorage.setItem('whatsapp_config', JSON.stringify(data.whatsapp));
-                    console.log('WhatsApp config updated from server');
+                    localStorage.setItem('whatsapp_config', JSON.stringify(data));
+                    console.log('WhatsApp config updated from Firebase');
                     
-                    // WhatsApp config is already stored in localStorage, script.js will use it
-                    console.log('WhatsApp config updated from server');
+                    // Update WhatsApp number on page
+                    updateWhatsAppNumber();
                 }
             })
             .catch(error => {
-                console.log('Server data loading failed, using local data:', error);
+                console.log('Firebase WhatsApp data loading failed, using local data:', error);
+                // Fallback to server data
+                fetch('/data/data.json?t=' + Date.now())
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('Server WhatsApp data loaded:', data);
+                        if (data.whatsapp) {
+                            localStorage.setItem('whatsapp_config', JSON.stringify(data.whatsapp));
+                            console.log('WhatsApp config updated from server');
+                            updateWhatsAppNumber();
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Server WhatsApp data loading failed:', error);
+                    });
             });
+        
+        // Listen for real-time updates
+        database.ref('/whatsapp').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                console.log('Firebase real-time update:', data);
+                localStorage.setItem('whatsapp_config', JSON.stringify(data));
+                updateWhatsAppNumber();
+            }
+        });
+        
+        // Function to update WhatsApp number on page
+        function updateWhatsAppNumber() {
+            const whatsappData = localStorage.getItem('whatsapp_config');
+            if (whatsappData) {
+                try {
+                    const whatsapp = JSON.parse(whatsappData);
+                    const now = new Date();
+                    const dayOfWeek = now.getDay();
+                    const hour = now.getHours();
+                    
+                    // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
+                    let effectiveDayOfWeek = dayOfWeek;
+                    let isNightTime = false;
+                    
+                    if (hour >= 18 || hour < 9) {
+                        isNightTime = true;
+                        // Gece saatlerinde bir önceki günün gece numarası kullanılır
+                        if (hour >= 18) {
+                            // 18:00'dan sonra aynı günün gece numarası
+                            effectiveDayOfWeek = dayOfWeek;
+                        } else {
+                            // 09:00'dan önce bir önceki günün gece numarası
+                            effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
+                        }
+                    }
+                    
+                    // Convert to admin panel index (0=Sunday -> 6, 1=Monday -> 0, etc.)
+                    let adminIndex;
+                    if (effectiveDayOfWeek === 0) {
+                        adminIndex = 6;
+                    } else {
+                        adminIndex = effectiveDayOfWeek - 1;
+                    }
+                    
+                    let currentNumber = null;
+                    
+                    // Firebase'den gelen veri yapısını kontrol et
+                    if (whatsapp.dailyNumbers) {
+                        if (Array.isArray(whatsapp.dailyNumbers)) {
+                            // Array formatında ise
+                            if (whatsapp.dailyNumbers[adminIndex]) {
+                                currentNumber = (hour >= 9 && hour < 18) 
+                                    ? whatsapp.dailyNumbers[adminIndex].morning 
+                                    : whatsapp.dailyNumbers[adminIndex].evening;
+                            }
+                        } else {
+                            // Object formatında ise
+                            if (whatsapp.dailyNumbers[adminIndex]) {
+                                currentNumber = (hour >= 9 && hour < 18) 
+                                    ? whatsapp.dailyNumbers[adminIndex].morning 
+                                    : whatsapp.dailyNumbers[adminIndex].evening;
+                            }
+                        }
+                    }
+                    
+                    // Update WhatsApp number element
+                    const whatsappElement = document.getElementById('whatsapp-number');
+                    if (whatsappElement && currentNumber) {
+                        const cleanNumber = currentNumber.replace(/\D/g, '');
+                        const whatsappUrl = `https://wa.me/${cleanNumber}`;
+                        whatsappElement.href = whatsappUrl;
+                        whatsappElement.textContent = `WhatsApp: +${currentNumber}`;
+                        
+                        console.log('WhatsApp element updated:', {
+                            currentNumber: currentNumber,
+                            cleanNumber: cleanNumber,
+                            url: whatsappUrl,
+                            originalDayOfWeek: dayOfWeek,
+                            effectiveDayOfWeek: effectiveDayOfWeek,
+                            adminIndex: adminIndex,
+                            hour: hour,
+                            isNightTime: isNightTime
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error updating WhatsApp number:', e);
+                }
+            }
+        }
     </script>
 
     <!-- Optimized Scripts -->

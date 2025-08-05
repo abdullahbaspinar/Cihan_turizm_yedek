@@ -1,5 +1,5 @@
-// ===== SECURITY MEASURES COMPLETELY REMOVED =====
-// All security measures have been completely removed for development purposes
+// ===== ADMIN PANEL =====
+// Full admin panel with content, image, and WhatsApp management
 
 // Basic authentication check
 function checkAdminAuthentication() {
@@ -71,21 +71,6 @@ function secureLoad(key) {
 
 // ===== ADMIN PANEL CONFIGURATION =====
 const ADMIN_CONFIG = {
-    // Content management
-    contentFields: {
-        hero: ['hero-title-1', 'hero-title-2', 'hero-title-3', 'hero-subtitle', 'hero-cta-text'],
-        about: ['vision-title', 'vision-description', 'mission-title', 'mission-description'],
-        services: ['services-title', 'services-subtitle', 'visa-title', 'visa-description', 'ticketing-title', 'ticketing-description'],
-        contact: ['contact-title', 'contact-subtitle', 'contact-address', 'contact-phone', 'contact-email'],
-        footer: ['footer-description', 'footer-copyright']
-    },
-    
-    // Image management
-    imageFields: {
-        hero: ['hero-image-1', 'hero-image-2', 'hero-image-3', 'hero-image-4', 'hero-image-5'],
-        partners: ['partner-thy', 'partner-turmed', 'partner-paribu', 'partner-papara', 'partner-okx', 'partner-architect', 'partner-gamak']
-    },
-    
     // WhatsApp settings
     whatsappDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
     whatsappMessages: ['visa-message', 'ticketing-message', 'contact-message']
@@ -112,7 +97,7 @@ function initializeAdminPanel() {
     initializeTabs();
     
     // Initialize image uploads
-    initializeImageUploads();
+
     
     // Update dashboard
     updateDashboard();
@@ -122,6 +107,11 @@ function initializeAdminPanel() {
     
     // Real-time updates
     setInterval(updateDashboard, 30000);
+    
+    // Initialize Firebase (optional)
+    if (typeof initializeFirebase === 'function') {
+        initializeFirebase();
+    }
 }
 
 // ===== NAVIGATION =====
@@ -194,27 +184,7 @@ function loadSavedData() {
         return;
     }
     
-    // Load content data
-    const savedContent = secureLoad('admin_content');
-    if (savedContent) {
-        Object.keys(savedContent).forEach(fieldId => {
-            const element = document.getElementById(fieldId);
-            if (element) {
-                element.value = savedContent[fieldId];
-            }
-        });
-    }
-    
-    // Load image data
-    const savedImages = secureLoad('admin_images');
-    if (savedImages) {
-        Object.keys(savedImages).forEach(imageId => {
-            const element = document.getElementById(imageId);
-            if (element) {
-                element.src = savedImages[imageId];
-            }
-        });
-    }
+
     
     // Load WhatsApp settings
     const savedWhatsApp = localStorage.getItem('whatsapp_config');
@@ -260,6 +230,7 @@ function loadSavedData() {
     }
 }
 
+// ===== SAVE ALL CHANGES =====
 function saveAllChanges() {
     // Check authentication first
     if (!checkAdminAuthentication()) {
@@ -267,25 +238,9 @@ function saveAllChanges() {
         return;
     }
     
-    // Save content
-    const contentData = {};
-    Object.values(ADMIN_CONFIG.contentFields).flat().forEach(fieldId => {
-        const element = document.getElementById(fieldId);
-        if (element) {
-            contentData[fieldId] = element.value;
-        }
-    });
-    secureSave('admin_content', contentData);
+
     
-    // Save images
-    const imageData = {};
-    Object.values(ADMIN_CONFIG.imageFields).flat().forEach(imageId => {
-        const element = document.getElementById(imageId);
-        if (element) {
-            imageData[imageId] = element.src;
-        }
-    });
-    secureSave('admin_images', imageData);
+
     
     // Save WhatsApp settings
     const whatsappData = {
@@ -329,17 +284,35 @@ function saveAllChanges() {
     const dayOfWeek = now.getDay();
     const hour = now.getHours();
     
+    // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
+    let effectiveDayOfWeek = dayOfWeek;
+    let isNightTime = false;
+    
+    if (hour >= 18 || hour < 9) {
+        isNightTime = true;
+        // Gece saatlerinde bir önceki günün gece numarası kullanılır
+        if (hour >= 18) {
+            // 18:00'dan sonra aynı günün gece numarası
+            effectiveDayOfWeek = dayOfWeek;
+        } else {
+            // 09:00'dan önce bir önceki günün gece numarası
+            effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
+        }
+    }
+    
     let adminIndex;
-    if (dayOfWeek === 0) {
+    if (effectiveDayOfWeek === 0) {
         adminIndex = 6;
     } else {
-        adminIndex = dayOfWeek - 1;
+        adminIndex = effectiveDayOfWeek - 1;
     }
     
     console.log('Test - Güncel Durum:', {
-        dayOfWeek: dayOfWeek,
+        originalDayOfWeek: dayOfWeek,
+        effectiveDayOfWeek: effectiveDayOfWeek,
         adminIndex: adminIndex,
         hour: hour,
+        isNightTime: isNightTime,
         currentDayNumber: whatsappData.dailyNumbers[adminIndex],
         isDayTime: hour >= 9 && hour < 18,
         expectedNumber: (hour >= 9 && hour < 18) 
@@ -360,111 +333,51 @@ function saveAllChanges() {
     
     showNotification('Tüm değişiklikler başarıyla kaydedildi!', 'success');
     
-    // Save to server for cross-device sync
-    fetch('admin/save.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            content: contentData,
-            images: imageData,
-            whatsapp: whatsappData
+
+
+    // Save WhatsApp data to Firebase Realtime Database (optional)
+    if (typeof saveWhatsAppDataToFirebase === 'function') {
+        saveWhatsAppDataToFirebase(whatsappData).then(success => {
+            if (success) {
+                console.log('Firebase Realtime Database\'e kaydedildi - Cross-device sync aktif');
+                showNotification('WhatsApp ayarları Firebase\'de senkronize edildi!', 'success');
+            } else {
+                console.error('Firebase kaydı başarısız');
+                showNotification('Yerel kayıt başarılı, Firebase kaydı başarısız', 'warning');
+            }
+        });
+    } else {
+        // Fallback to server sync
+        fetch('admin/save.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                whatsapp: whatsappData
+            })
         })
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.status === 'success') {
-            console.log('Sunucuya kaydedildi - Cross-device sync aktif');
-            showNotification('Değişiklikler tüm cihazlarda senkronize edildi!', 'success');
-        } else {
-            console.error('Sunucu kaydı başarısız:', res.message);
-            showNotification('Yerel kayıt başarılı, sunucu kaydı başarısız', 'warning');
-        }
-    })
-    .catch(error => {
-        console.error('Sunucu kaydı hatası:', error);
-        showNotification('Yerel kayıt başarılı, sunucu bağlantısı yok', 'warning');
-    });
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === 'success') {
+                console.log('Sunucuya kaydedildi - Cross-device sync aktif');
+                showNotification('Değişiklikler tüm cihazlarda senkronize edildi!', 'success');
+            } else {
+                console.error('Sunucu kaydı başarısız:', res.message);
+                showNotification('Yerel kayıt başarılı, sunucu kaydı başarısız', 'warning');
+            }
+        })
+        .catch(error => {
+            console.error('Sunucu kaydı hatası:', error);
+            showNotification('Yerel kayıt başarılı, sunucu bağlantısı yok', 'warning');
+        });
+    }
+    
     updateDashboard();
 }
 
-// ===== IMAGE MANAGEMENT =====
-function initializeImageUploads() {
-    // Add event listeners for all file inputs
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    fileInputs.forEach(input => {
-        input.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                handleImageUpload(file, this);
-            }
-        });
-    });
-}
 
-function handleImageUpload(file, inputElement) {
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-        showNotification('Lütfen geçerli bir görsel dosyası seçin!', 'error');
-        return;
-    }
-    
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        showNotification('Dosya boyutu 5MB\'dan küçük olmalıdır!', 'error');
-        return;
-    }
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const imageId = inputElement.id.replace('-file', '-image');
-        const imageElement = document.getElementById(imageId);
-        
-        if (imageElement) {
-            imageElement.src = e.target.result;
-            showNotification('Görsel başarıyla yüklendi!', 'success');
-        }
-    };
-    
-    reader.readAsDataURL(file);
-}
-
-function previewImage(input, imageId) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imageElement = document.getElementById(imageId);
-            if (imageElement) {
-                imageElement.src = e.target.result;
-            }
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
 
 // ===== DASHBOARD =====
 function updateDashboard() {
-    // Update edited content count
-    const contentData = localStorage.getItem('admin_content');
-    if (contentData) {
-        const content = JSON.parse(contentData);
-        const editedCount = Object.keys(content).length;
-        const editedElement = document.getElementById('edited-content-count');
-        if (editedElement) {
-            editedElement.textContent = editedCount;
-        }
-    }
-    
-    // Update changed images count
-    const imageData = localStorage.getItem('admin_images');
-    if (imageData) {
-        const images = JSON.parse(imageData);
-        const changedCount = Object.keys(images).length;
-        const changedElement = document.getElementById('changed-images-count');
-        if (changedElement) {
-            changedElement.textContent = changedCount;
-        }
-    }
-    
     // Update last update time
     const lastUpdateElement = document.getElementById('last-update-time');
     if (lastUpdateElement) {
@@ -479,12 +392,26 @@ function updateDashboard() {
         const dayOfWeek = now.getDay();
         const hour = now.getHours();
         
+        // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
+        let effectiveDayOfWeek = dayOfWeek;
+        
+        if (hour >= 18 || hour < 9) {
+            // Gece saatlerinde bir önceki günün gece numarası kullanılır
+            if (hour >= 18) {
+                // 18:00'dan sonra aynı günün gece numarası
+                effectiveDayOfWeek = dayOfWeek;
+            } else {
+                // 09:00'dan önce bir önceki günün gece numarası
+                effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
+            }
+        }
+        
         // Admin panelindeki index'e çevir (0=Pazar -> 6, 1=Pazartesi -> 0, 2=Salı -> 1, ...)
         let adminIndex;
-        if (dayOfWeek === 0) { // Pazar
+        if (effectiveDayOfWeek === 0) { // Pazar
             adminIndex = 6;
         } else {
-            adminIndex = dayOfWeek - 1; // Pazartesi=0, Salı=1, ...
+            adminIndex = effectiveDayOfWeek - 1; // Pazartesi=0, Salı=1, ...
         }
         
         if (whatsapp.dailyNumbers && whatsapp.dailyNumbers[adminIndex]) {
@@ -561,20 +488,6 @@ function showNotification(message, type = 'info') {
 }
 
 // ===== QUICK ACTIONS =====
-function showContentEditor() {
-    const contentNav = document.querySelector('[data-section="content"]');
-    if (contentNav) {
-        contentNav.click();
-    }
-}
-
-function showImageManager() {
-    const imagesNav = document.querySelector('[data-section="images"]');
-    if (imagesNav) {
-        imagesNav.click();
-    }
-}
-
 function showWhatsAppSettings() {
     const whatsappNav = document.querySelector('[data-section="whatsapp"]');
     if (whatsappNav) {
@@ -587,138 +500,27 @@ function previewChanges() {
     window.open('index.html', '_blank');
 }
 
-// ===== DATA EXPORT/IMPORT =====
-function exportData() {
-    const data = {
-        content: JSON.parse(localStorage.getItem('admin_content') || '{}'),
-        images: JSON.parse(localStorage.getItem('admin_images') || '{}'),
-        whatsapp: JSON.parse(localStorage.getItem('whatsapp_config') || '{}'),
-        settings: JSON.parse(localStorage.getItem('admin_settings') || '{}'),
-        exportDate: new Date().toISOString()
-    };
-    
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `cihanturizm-admin-data-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showNotification('Veriler başarıyla dışa aktarıldı!', 'success');
-}
-
-function importData() {
-    const input = document.getElementById('import-file');
-    if (input) {
-        input.click();
+// ===== FIREBASE INITIALIZATION =====
+function initializeFirebase() {
+    // Check if Firebase is available
+    if (typeof firebase === 'undefined') {
+        console.log('Firebase SDK yüklenmedi, yerel modda çalışıyor');
+        return;
     }
-}
-
-function handleImportFile(input) {
-    const file = input.files[0];
-    if (!file) return;
     
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            
-            // Import content
-            if (data.content) {
-                localStorage.setItem('admin_content', JSON.stringify(data.content));
-                Object.keys(data.content).forEach(fieldId => {
-                    const element = document.getElementById(fieldId);
-                    if (element) {
-                        element.value = data.content[fieldId];
-                    }
-                });
+    // Load WhatsApp data from Firebase
+    if (typeof loadWhatsAppDataFromFirebase === 'function') {
+        loadWhatsAppDataFromFirebase().then(success => {
+            if (success) {
+                showNotification('Firebase\'den WhatsApp verileri yüklendi!', 'success');
+                updateDashboard();
             }
-            
-            // Import images
-            if (data.images) {
-                localStorage.setItem('admin_images', JSON.stringify(data.images));
-                Object.keys(data.images).forEach(imageId => {
-                    const element = document.getElementById(imageId);
-                    if (element) {
-                        element.src = data.images[imageId];
-                    }
-                });
-            }
-            
-            // Import WhatsApp settings
-            if (data.whatsapp) {
-                localStorage.setItem('whatsapp_config', JSON.stringify(data.whatsapp));
-                
-                // Update form fields
-                const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-                dayNames.forEach((day, index) => {
-                    const morningInput = document.getElementById(`${day}-morning`);
-                    const eveningInput = document.getElementById(`${day}-evening`);
-                    
-                    if (data.whatsapp.dailyNumbers && data.whatsapp.dailyNumbers[index]) {
-                        if (morningInput) morningInput.value = data.whatsapp.dailyNumbers[index].morning || '';
-                        if (eveningInput) eveningInput.value = data.whatsapp.dailyNumbers[index].evening || '';
-                    }
-                });
-                
-                if (data.whatsapp.messages) {
-                    Object.keys(data.whatsapp.messages).forEach(key => {
-                        const element = document.getElementById(`${key}-message`);
-                        if (element) {
-                            element.value = data.whatsapp.messages[key];
-                        }
-                    });
-                }
-            }
-            
-            // Import settings
-            if (data.settings) {
-                localStorage.setItem('admin_settings', JSON.stringify(data.settings));
-                Object.keys(data.settings).forEach(fieldId => {
-                    const element = document.getElementById(fieldId);
-                    if (element) {
-                        element.value = data.settings[fieldId];
-                    }
-                });
-            }
-            
-            showNotification('Veriler başarıyla içe aktarıldı!', 'success');
-            updateDashboard();
-            
-        } catch (error) {
-            showNotification('Dosya formatı geçersiz!', 'error');
-            console.error('Import error:', error);
-        }
-    };
+        });
+    }
     
-    reader.readAsText(file);
-    input.value = ''; // Reset input
-}
-
-function resetData() {
-    if (confirm('Tüm verileri sıfırlamak istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
-        localStorage.removeItem('admin_content');
-        localStorage.removeItem('admin_images');
-        localStorage.removeItem('whatsapp_config');
-        localStorage.removeItem('admin_settings');
-        
-        // Reset form fields
-        const inputs = document.querySelectorAll('input, textarea');
-        inputs.forEach(input => {
-            input.value = '';
-        });
-        
-        // Reset images to original
-        const images = document.querySelectorAll('img[id*="-image"]');
-        images.forEach(img => {
-            img.src = img.getAttribute('data-original') || img.src;
-        });
-        
-        showNotification('Tüm veriler sıfırlandı!', 'success');
-        updateDashboard();
+    // Start real-time sync for WhatsApp
+    if (typeof listenForWhatsAppUpdates === 'function') {
+        listenForWhatsAppUpdates();
     }
 }
 
@@ -728,86 +530,27 @@ function logoutAdmin() {
         // Clear session
         localStorage.removeItem('admin_session');
         
+        // Sign out from Firebase (optional)
+        if (typeof signOut === 'function') {
+            signOut().then(() => {
+                console.log('Firebase\'den çıkış yapıldı');
+            }).catch(error => {
+                console.log('Firebase çıkış hatası:', error);
+            });
+        }
+        
         // Redirect to main page
         window.location.href = 'index.html';
     }
 }
 
-// ===== DYNAMIC IMAGE MANAGEMENT =====
-function addHeroImage() {
-    const grid = document.getElementById('hero-images-grid');
-    const currentCount = grid.children.length;
-    const newIndex = currentCount + 1;
-    
-    const newImageItem = document.createElement('div');
-    newImageItem.className = 'image-item';
-    newImageItem.innerHTML = `
-        <label>Hero Görsel ${newIndex}</label>
-        <div class="image-preview">
-            <img id="hero-image-${newIndex}" src="assets/anasayfa/header-1.webp" alt="Hero ${newIndex}">
-        </div>
-        <input type="file" id="hero-file-${newIndex}" accept="image/*" onchange="previewImage(this, 'hero-image-${newIndex}')">
-        <button class="upload-btn" onclick="document.getElementById('hero-file-${newIndex}').click()">
-            <span class="material-icons">upload</span>
-            Görsel Yükle
-        </button>
-    `;
-    
-    grid.appendChild(newImageItem);
-    
-    // Update admin config
-    ADMIN_CONFIG.imageFields.hero.push(`hero-image-${newIndex}`);
-    
-    showNotification(`Hero Görsel ${newIndex} eklendi!`, 'success');
-}
 
-function removeHeroImage() {
-    const grid = document.getElementById('hero-images-grid');
-    const currentCount = grid.children.length;
-    
-    if (currentCount <= 1) {
-        showNotification('En az 1 görsel olmalıdır!', 'error');
-        return;
-    }
-    
-    const lastItem = grid.lastElementChild;
-    const imageId = lastItem.querySelector('img').id;
-    
-    // Remove from DOM
-    grid.removeChild(lastItem);
-    
-    // Remove from admin config
-    const index = ADMIN_CONFIG.imageFields.hero.indexOf(imageId);
-    if (index > -1) {
-        ADMIN_CONFIG.imageFields.hero.splice(index, 1);
-    }
-    
-    // Update labels
-    const items = grid.querySelectorAll('.image-item');
-    items.forEach((item, index) => {
-        const label = item.querySelector('label');
-        if (label) {
-            label.textContent = `Hero Görsel ${index + 1}`;
-        }
-    });
-    
-    showNotification('Son görsel silindi!', 'success');
-}
 
 // ===== GLOBAL FUNCTIONS =====
 window.saveAllChanges = saveAllChanges;
-window.showContentEditor = showContentEditor;
-window.showImageManager = showImageManager;
 window.showWhatsAppSettings = showWhatsAppSettings;
 window.previewChanges = previewChanges;
-window.exportData = exportData;
-window.importData = importData;
-window.resetData = resetData;
 window.logoutAdmin = logoutAdmin;
-window.previewImage = previewImage;
-window.handleImportFile = handleImportFile;
-window.addHeroImage = addHeroImage;
-window.removeHeroImage = removeHeroImage;
 
 // Test WhatsApp number function
 window.testWhatsAppNumber = function() {
@@ -822,12 +565,28 @@ window.testWhatsAppNumber = function() {
     const dayOfWeek = now.getDay();
     const hour = now.getHours();
     
+    // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
+    let effectiveDayOfWeek = dayOfWeek;
+    let isNightTime = false;
+    
+    if (hour >= 18 || hour < 9) {
+        isNightTime = true;
+        // Gece saatlerinde bir önceki günün gece numarası kullanılır
+        if (hour >= 18) {
+            // 18:00'dan sonra aynı günün gece numarası
+            effectiveDayOfWeek = dayOfWeek;
+        } else {
+            // 09:00'dan önce bir önceki günün gece numarası
+            effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
+        }
+    }
+    
     // Admin panelindeki index'e çevir
     let adminIndex;
-    if (dayOfWeek === 0) {
+    if (effectiveDayOfWeek === 0) {
         adminIndex = 6;
     } else {
-        adminIndex = dayOfWeek - 1;
+        adminIndex = effectiveDayOfWeek - 1;
     }
     
     const dayNames = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
@@ -843,20 +602,24 @@ window.testWhatsAppNumber = function() {
     if (resultDiv) {
         resultDiv.innerHTML = `
             <div class="test-info">
-                <p><strong>Gün:</strong> ${currentDayName}</p>
+                <p><strong>Gerçek Gün:</strong> ${dayNames[dayOfWeek] || 'Bilinmiyor'}</p>
+                <p><strong>Hesaplanan Gün:</strong> ${currentDayName}</p>
                 <p><strong>Saat:</strong> ${hour}:00</p>
                 <p><strong>Zaman:</strong> ${timeType} (${isDayTime ? '09:00-18:00' : '18:00-09:00'})</p>
-                <p><strong>Aktif Numara:</strong> ${currentNumber || 'Numara bulunamadı'}</p>
+                <p><strong>Gece Saati:</strong> ${isNightTime ? 'Evet' : 'Hayır'}</p>
                 <p><strong>Admin Index:</strong> ${adminIndex}</p>
+                <p><strong>Aktif Numara:</strong> ${currentNumber || 'Numara bulunamadı'}</p>
             </div>
         `;
     }
     
     console.log('WhatsApp Test Sonucu:', {
-        dayOfWeek: dayOfWeek,
+        originalDayOfWeek: dayOfWeek,
+        effectiveDayOfWeek: effectiveDayOfWeek,
         adminIndex: adminIndex,
         currentDayName: currentDayName,
         hour: hour,
+        isNightTime: isNightTime,
         isDayTime: isDayTime,
         timeType: timeType,
         currentNumber: currentNumber,
