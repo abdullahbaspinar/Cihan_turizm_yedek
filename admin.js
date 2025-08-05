@@ -1,5 +1,7 @@
-// ===== SECURITY MEASURES FOR ADMIN PANEL =====
-// Check if user is authenticated
+// ===== SECURITY MEASURES COMPLETELY REMOVED =====
+// All security measures have been completely removed for development purposes
+
+// Basic authentication check
 function checkAdminAuthentication() {
     const session = localStorage.getItem('admin_session');
     if (!session) {
@@ -7,107 +9,40 @@ function checkAdminAuthentication() {
         return false;
     }
     
-    // Check session expiry (24 hours)
-    const sessionData = JSON.parse(session);
-    const now = new Date().getTime();
-    const sessionTime = new Date(sessionData.timestamp).getTime();
-    const hoursDiff = (now - sessionTime) / (1000 * 60 * 60);
-    
-    if (hoursDiff > 24) {
-        localStorage.removeItem('admin_session');
-        window.location.href = 'index.html';
-        return false;
-    }
-    
-    return true;
-}
-
-// Auto logout on inactivity (30 minutes)
-let inactivityTimer;
-function resetInactivityTimer() {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-        localStorage.removeItem('admin_session');
-        window.location.href = 'index.html';
-    }, 30 * 60 * 1000); // 30 minutes
-}
-
-// Reset timer on user activity
-document.addEventListener('mousemove', resetInactivityTimer);
-document.addEventListener('keypress', resetInactivityTimer);
-document.addEventListener('click', resetInactivityTimer);
-document.addEventListener('scroll', resetInactivityTimer);
-
-// Disable admin panel access from iframe
-if (window.top !== window.self) {
-    window.top.location = window.self.location;
-}
-
-// Disable browser back button in admin panel
-window.history.pushState(null, null, window.location.href);
-window.addEventListener('popstate', function() {
-    window.history.pushState(null, null, window.location.href);
-});
-
-// Disable admin panel shortcuts
-document.addEventListener('keydown', function(e) {
-    // Disable Ctrl+S in admin panel
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault();
-        showNotification('Sayfa kaydetme devre dışı bırakıldı.', 'warning');
-        return false;
-    }
-    
-    // Disable Ctrl+P in admin panel
-    if (e.ctrlKey && e.key === 'p') {
-        e.preventDefault();
-        showNotification('Yazdırma devre dışı bırakıldı.', 'warning');
-        return false;
-    }
-    
-    // Disable F5 in admin panel
-    if (e.key === 'F5') {
-        e.preventDefault();
-        showNotification('Sayfa yenileme devre dışı bırakıldı.', 'warning');
-        return false;
-    }
-});
-
-// Encrypt sensitive data before saving
-function encryptData(data) {
-    // Simple encryption for sensitive data
-    return btoa(JSON.stringify(data));
-}
-
-// Decrypt sensitive data
-function decryptData(encryptedData) {
     try {
-        return JSON.parse(atob(encryptedData));
-    } catch (e) {
-        return null;
-    }
-}
-
-// Secure save function
-function secureSave(key, data) {
-    try {
-        const encryptedData = encryptData(data);
-        localStorage.setItem(key, encryptedData);
+        const sessionData = JSON.parse(session);
+        if (!sessionData.loggedIn) {
+            localStorage.removeItem('admin_session');
+            window.location.href = 'index.html';
+            return false;
+        }
         return true;
     } catch (e) {
-        console.error('Güvenli kaydetme hatası:', e);
+        localStorage.removeItem('admin_session');
+        window.location.href = 'index.html';
         return false;
     }
 }
 
-// Secure load function
+// Simple save function
+function secureSave(key, data) {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+        return true;
+    } catch (e) {
+        console.error('Kaydetme hatası:', e);
+        return false;
+    }
+}
+
+// Simple load function
 function secureLoad(key) {
     try {
-        const encryptedData = localStorage.getItem(key);
-        if (!encryptedData) return null;
-        return decryptData(encryptedData);
+        const data = localStorage.getItem(key);
+        if (!data) return null;
+        return JSON.parse(data);
     } catch (e) {
-        console.error('Güvenli yükleme hatası:', e);
+        console.error('Yükleme hatası:', e);
         return null;
     }
 }
@@ -138,12 +73,8 @@ const ADMIN_CONFIG = {
 document.addEventListener('DOMContentLoaded', function() {
     // Check authentication first
     if (!checkAdminAuthentication()) {
-        window.location.href = 'index.html';
         return;
     }
-    
-    // Reset inactivity timer
-    resetInactivityTimer();
     
     initializeAdminPanel();
 });
@@ -747,15 +678,8 @@ function resetData() {
 // ===== LOGOUT =====
 function logoutAdmin() {
     if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
-        // Clear all admin data
+        // Clear session
         localStorage.removeItem('admin_session');
-        localStorage.removeItem('admin_content');
-        localStorage.removeItem('admin_images');
-        localStorage.removeItem('whatsapp_config');
-        localStorage.removeItem('admin_settings');
-        
-        // Clear session storage
-        sessionStorage.clear();
         
         // Redirect to main page
         window.location.href = 'index.html';

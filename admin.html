@@ -2,14 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-    <meta name="googlebot" content="noindex, nofollow">
-    <meta name="bingbot" content="noindex, nofollow">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Admin Panel - Cihanturizm</title>
     
     <!-- Stylesheets -->
@@ -20,19 +14,27 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/ercihanlogo-transparent.png">
     
-    <!-- Session Protection Script -->
+    <!-- Basic Session Protection -->
     <script>
         (function() {
+            // Check if user has valid session
             const sessionData = localStorage.getItem('admin_session');
             if (!sessionData) {
+                // Redirect to main page if no session
                 window.location.href = 'index.html';
                 return;
             }
             
-            const session = JSON.parse(sessionData);
-            const now = Date.now();
-            
-            if (!session.loggedIn || now >= session.expires) {
+            try {
+                const session = JSON.parse(sessionData);
+                // Simple session check (no expiry for now)
+                if (!session.loggedIn) {
+                    localStorage.removeItem('admin_session');
+                    window.location.href = 'index.html';
+                    return;
+                }
+            } catch (e) {
+                // Invalid session data, redirect
                 localStorage.removeItem('admin_session');
                 window.location.href = 'index.html';
                 return;

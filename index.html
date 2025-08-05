@@ -2,14 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-    <meta name="googlebot" content="noindex, nofollow">
-    <meta name="bingbot" content="noindex, nofollow">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
     
     <!-- Primary Meta Tags -->
     <title>Cihanturizm | Profesyonel Vize Danışmanlığı ve Biletleme Hizmetleri</title>
@@ -50,12 +44,23 @@
     <!-- Preconnect for Performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Critical CSS inline -->
+    <style>
+        /* Critical CSS for above-the-fold content */
+        body { margin: 0; font-family: 'Inter', sans-serif; }
+        .preloader { display: none; }
+        .hero-section { min-height: 100vh; }
+    </style>
+    
+    <!-- Stylesheets with preload -->
+    <link rel="preload" href="style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="style.css"></noscript>
+    
+    <!-- Fonts with display=swap for better performance -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/ercihanlogo-transparent.png">
@@ -136,21 +141,11 @@
     </script>
 </head>
 <body>
-    <!-- Preloader -->
-    <div id="preloader" class="preloader" aria-hidden="true">
+    <!-- Optimized preloader - hidden by default -->
+    <div id="preloader" class="preloader" aria-hidden="true" style="display: none;">
         <div class="preloader-content">
             <div class="preloader-logo">
-                <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image">
-            </div>
-            <div class="middle">
-                <div class="bar bar1" aria-hidden="true"></div>
-                <div class="bar bar2" aria-hidden="true"></div>
-                <div class="bar bar3" aria-hidden="true"></div>
-                <div class="bar bar4" aria-hidden="true"></div>
-                <div class="bar bar5" aria-hidden="true"></div>
-                <div class="bar bar6" aria-hidden="true"></div>
-                <div class="bar bar7" aria-hidden="true"></div>
-                <div class="bar bar8" aria-hidden="true"></div>
+                <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image" loading="eager">
             </div>
         </div>
     </div>
@@ -162,7 +157,7 @@
             <div class="nav-container">
                 <div class="nav-logo">
                     <a href="#home" class="logo-link" aria-label="Ana sayfaya git">
-                        <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image">
+                        <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="logo-image" loading="eager">
                     </a>
                 </div>
                 
@@ -189,19 +184,19 @@
             <div class="hero-background">
                 <div class="hero-slider" aria-hidden="true">
                     <div class="hero-slide active">
-                        <img src="assets/anasayfa/header-1.webp" alt="Cihanturizm Hero 1" class="hero-bg-image">
+                        <img src="assets/anasayfa/header-1.webp" alt="Cihanturizm Hero 1" class="hero-bg-image" loading="eager">
                     </div>
                     <div class="hero-slide">
-                        <img src="assets/anasayfa/header-2.webp" alt="Cihanturizm Hero 2" class="hero-bg-image">
+                        <img src="assets/anasayfa/header-2.webp" alt="Cihanturizm Hero 2" class="hero-bg-image" loading="lazy">
                     </div>
                     <div class="hero-slide">
-                        <img src="assets/anasayfa/header-4.jpg" alt="Cihanturizm Hero 3" class="hero-bg-image">
+                        <img src="assets/anasayfa/header-4.jpg" alt="Cihanturizm Hero 3" class="hero-bg-image" loading="lazy">
                     </div>
                     <div class="hero-slide">
-                        <img src="assets/anasayfa/header-5.jpg" alt="Cihanturizm Hero 4" class="hero-bg-image">
+                        <img src="assets/anasayfa/header-5.jpg" alt="Cihanturizm Hero 4" class="hero-bg-image" loading="lazy">
                     </div>
                     <div class="hero-slide">
-                        <img src="assets/anasayfa/header-6.jpeg" alt="Cihanturizm Hero 5" class="hero-bg-image">
+                        <img src="assets/anasayfa/header-6.jpeg" alt="Cihanturizm Hero 5" class="hero-bg-image" loading="lazy">
                     </div>
                 </div>
                 <div class="hero-overlay"></div>
@@ -651,10 +646,7 @@
                 <div class="footer-section">
                     <h4>Sosyal Medya</h4>
                     <div class="social-links">
-                        <a href="#" class="social-link" title="LinkedIn" aria-label="LinkedIn sayfamızı ziyaret edin">
-                            <span class="material-icons" aria-hidden="true">linkedin</span>
-                        </a>
-                        <a href="#" class="social-link" title="Instagram" aria-label="Instagram sayfamızı ziyaret edin">
+                        <a href="https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.instagram.com/ercihanturizm/&ved=2ahUKEwig-rfPvvSOAxXdVfEDHXuNNRwQFnoECB0QAQ&usg=AOvVaw00JfYYpAs2KNZTDJ1bTaej" target="_blank" rel="noopener noreferrer" class="social-link" title="Instagram" aria-label="Instagram sayfamızı ziyaret edin">
                             <span class="material-icons" aria-hidden="true">camera_alt</span>
                         </a>
                     </div>
@@ -663,8 +655,8 @@
             
             <div class="footer-bottom">
                 <div class="footer-legal">
-                    <a href="#" class="legal-link">Gizlilik Politikası</a>
-                    <a href="#" class="legal-link">Kullanım Şartları</a>
+                    <a href="#" class="legal-link" onclick="showPrivacyPolicy()">Gizlilik Politikası</a>
+                    <a href="#" class="legal-link" onclick="showTermsOfService()">Kullanım Şartları</a>
                 </div>
                 <div class="footer-copyright">
                     <p>&copy; 2025 Cihanturizm. Tüm hakları saklıdır.</p>
@@ -679,6 +671,91 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- Legal Modals -->
+    <div class="legal-modal" id="privacy-modal">
+        <div class="legal-modal-content">
+            <div class="legal-modal-header">
+                <h3>Gizlilik Politikası</h3>
+                <button class="legal-modal-close" onclick="hideLegalModal('privacy-modal')">×</button>
+            </div>
+            <div class="legal-modal-body">
+                <h4>1. Kişisel Verilerin Korunması</h4>
+                <p>Cihanturizm olarak, müşterilerimizin kişisel verilerinin güvenliği bizim için son derece önemlidir. Bu politika, hangi bilgileri topladığımızı, nasıl kullandığımızı ve koruduğumuzu açıklar.</p>
+                
+                <h4>2. Toplanan Bilgiler</h4>
+                <p>Hizmetlerimizi sunarken aşağıdaki bilgileri toplayabiliriz:</p>
+                <ul>
+                    <li>Ad, soyad ve iletişim bilgileri</li>
+                    <li>Pasaport ve vize bilgileri</li>
+                    <li>Rezervasyon ve seyahat detayları</li>
+                    <li>İletişim geçmişi ve tercihler</li>
+                </ul>
+                
+                <h4>3. Bilgilerin Kullanımı</h4>
+                <p>Topladığımız bilgileri şu amaçlarla kullanırız:</p>
+                <ul>
+                    <li>Vize başvuru süreçlerini yönetmek</li>
+                    <li>Rezervasyon işlemlerini gerçekleştirmek</li>
+                    <li>Müşteri hizmetleri sunmak</li>
+                    <li>Yasal yükümlülükleri yerine getirmek</li>
+                </ul>
+                
+                <h4>4. Veri Güvenliği</h4>
+                <p>Kişisel verilerinizi korumak için endüstri standardı güvenlik önlemleri kullanıyoruz. Verileriniz şifrelenmiş olarak saklanır ve sadece yetkili personel tarafından erişilebilir.</p>
+                
+                <h4>5. İletişim</h4>
+                <p>Gizlilik politikamız hakkında sorularınız için: info@cihanturizm.com</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-modal" id="terms-modal">
+        <div class="legal-modal-content">
+            <div class="legal-modal-header">
+                <h3>Kullanım Şartları</h3>
+                <button class="legal-modal-close" onclick="hideLegalModal('terms-modal')">×</button>
+            </div>
+            <div class="legal-modal-body">
+                <h4>1. Hizmet Kapsamı</h4>
+                <p>Cihanturizm, vize danışmanlığı, uçak bileti, otel rezervasyonu ve araç kiralama hizmetleri sunar. Bu hizmetler, belirtilen koşullar ve şartlar çerçevesinde sağlanır.</p>
+                
+                <h4>2. Müşteri Sorumlulukları</h4>
+                <p>Müşterilerimizden beklediğimiz sorumluluklar:</p>
+                <ul>
+                    <li>Doğru ve güncel bilgi sağlamak</li>
+                    <li>Gerekli belgeleri zamanında teslim etmek</li>
+                    <li>Ödeme yükümlülüklerini yerine getirmek</li>
+                    <li>Hizmet şartlarına uymak</li>
+                </ul>
+                
+                <h4>3. Ödeme ve İptal</h4>
+                <p>Ödeme koşulları ve iptal politikaları:</p>
+                <ul>
+                    <li>Hizmet bedelleri peşin ödenir</li>
+                    <li>İptal durumunda ücret iadesi yapılır</li>
+                    <li>Vize reddi durumunda iade politikası geçerlidir</li>
+                    <li>Havayolu şirketlerinin iptal koşulları uygulanır</li>
+                </ul>
+                
+                <h4>4. Sorumluluk Sınırları</h4>
+                <p>Cihanturizm, hizmetlerimizde maksimum dikkat göstermekle birlikte, aşağıdaki durumlardan sorumlu değildir:</p>
+                <ul>
+                    <li>Müşteri tarafından sağlanan yanlış bilgiler</li>
+                    <li>Resmi makamların kararları</li>
+                    <li>Doğal afetler ve olağanüstü durumlar</li>
+                    <li>Üçüncü taraf hizmet sağlayıcıların aksaklıkları</li>
+                </ul>
+                
+                <h4>5. Değişiklikler</h4>
+                <p>Bu şartlar önceden haber verilmeksizin değiştirilebilir. Güncel şartlar web sitemizde yayınlanır.</p>
+                
+                <h4>6. İletişim</h4>
+                <p>Kullanım şartları hakkında sorularınız için: info@cihanturizm.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optimized Scripts -->
+    <script src="script.js" defer></script>
 </body>
 </html> 

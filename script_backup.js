@@ -190,13 +190,7 @@ function hideLoginModal() {
 }
 
 function loginAdmin() {
-    // Create session for admin access
-    const sessionData = {
-        loggedIn: true,
-        timestamp: Date.now()
-    };
-    localStorage.setItem('admin_session', JSON.stringify(sessionData));
-    
+    // Direct access to admin panel
     hideLoginModal();
     showNotification('Admin paneline başarıyla giriş yapıldı!', 'success');
     
@@ -483,7 +477,7 @@ function initializeWhatsApp() {
             const modal = document.getElementById('admin-login-modal');
             if (modal && modal.style.display === 'flex') {
                 e.preventDefault(); // Form submit'i engelle
-            loginAdmin();
+                loginAdmin();
             }
         }
     });
@@ -511,41 +505,47 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ===== OPTIMIZED INITIALIZE APP =====
+// ===== INITIALIZE APP =====
 function initializeApp() {
-    // Critical functions first
+    // Load admin content and images
     loadContentFromAdmin();
     loadImagesFromAdmin();
+    
+    // Navbar scroll effect
     handleNavbarScroll();
+    
+    // Mobile menu toggle
     handleMobileMenu();
+    
+    // Smooth scrolling for anchor links
     handleSmoothScroll();
+    
+    // Form handling
+    initializeFormHandling();
+    
+    // AOS (Animate On Scroll) initialization
+    initializeAOS();
+    
+    // Service card interactions
+    handleServiceCards();
+    
+    // Parallax effects
+    handleParallaxEffects();
+    
+    // Counter animation
+    initializeCounterAnimation();
+    
+    // Hero slider
+    initializeHeroSlider();
+    
+    // WhatsApp initialization
     initializeWhatsApp();
     
-    // Defer non-critical functions
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
-    initializeFormHandling();
-    initializeAOS();
-    handleServiceCards();
-    handleParallaxEffects();
-    initializeCounterAnimation();
-    initializeHeroSlider();
+    // SEO optimizations
     initializeSEOOptimizations();
+    
+    // Analytics
     initializeAnalytics();
-        });
-    } else {
-        // Fallback for older browsers
-        setTimeout(() => {
-            initializeFormHandling();
-            initializeAOS();
-            handleServiceCards();
-            handleParallaxEffects();
-            initializeCounterAnimation();
-            initializeHeroSlider();
-            initializeSEOOptimizations();
-            initializeAnalytics();
-        }, 100);
-    }
 }
 
 // ===== PRELOADER (REMOVED) =====
@@ -923,18 +923,10 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// ===== OPTIMIZED LAZY LOADING =====
+// ===== LAZY LOADING (if needed) =====
 function lazyLoadImages() {
-    // Use native lazy loading if supported
-    if ('loading' in HTMLImageElement.prototype) {
     const images = document.querySelectorAll('img[data-src]');
-        images.forEach(img => {
-            img.src = img.dataset.src;
-            img.loading = 'lazy';
-        });
-    } else {
-        // Fallback for older browsers
-        const images = document.querySelectorAll('img[data-src]');
+    
     const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -947,7 +939,6 @@ function lazyLoadImages() {
     });
     
     images.forEach(img => imageObserver.observe(img));
-    }
 }
 
 // ===== ANALYTICS (placeholder) =====
@@ -999,9 +990,6 @@ function isDOMReady() {
 window.scrollToSection = scrollToSection;
 window.showNotification = showNotification;
 window.trackEvent = trackEvent;
-window.showPrivacyPolicy = showPrivacyPolicy;
-window.showTermsOfService = showTermsOfService;
-window.hideLegalModal = hideLegalModal;
 
 // ===== FORM HANDLING =====
 function initializeFormHandling() {
@@ -1187,49 +1175,165 @@ function initializeAnalytics() {
     });
 } 
 
-// ===== LEGAL MODAL FUNCTIONS =====
-function showPrivacyPolicy() {
-    const modal = document.getElementById('privacy-modal');
-    if (modal) {
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
-    }
-}
-
-function showTermsOfService() {
-    const modal = document.getElementById('terms-modal');
-    if (modal) {
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
-    }
-}
-
-function hideLegalModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300);
-    }
-}
-
-// Close modal when clicking outside
-document.addEventListener('DOMContentLoaded', function() {
-    const legalModals = document.querySelectorAll('.legal-modal');
-    legalModals.forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                const modalId = modal.id;
-                hideLegalModal(modalId);
+// ===== SECURITY MEASURES COMPLETELY REMOVED =====
+// All security measures have been completely removed for development purposes
+    
+    setInterval(() => {
+        const threshold = 160;
+        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        
+        if (widthThreshold || heightThreshold) {
+            if (!devtools.open) {
+                devtools.open = true;
+                // Redirect or show warning
+                document.body.innerHTML = '<div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;"><h1>⚠️ Güvenlik Uyarısı</h1><p>Bu site güvenlik nedeniyle korunmaktadır.</p></div>';
             }
+        } else {
+            devtools.open = false;
+        }
+    }, 500);
+    
+    // Override console methods to prevent debugging
+    console.log = function() {};
+    console.warn = function() {};
+    console.error = function() {};
+    console.info = function() {};
+    console.debug = function() {};
+})();
+
+// Disable view source
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable save page
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable print screen
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'PrintScreen') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable F5 refresh
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F5') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable Ctrl+R refresh
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && (e.key === 'r' || e.key === 'R')) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable backspace navigation
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable function keys (only F12 and F5)
+document.addEventListener('keydown', function(e) {
+    if (e.keyCode === 123 || e.keyCode === 116) { // F12 and F5
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable Ctrl key combinations (only specific ones)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey) {
+        // Allow Ctrl+A, Ctrl+C, Ctrl+V for input fields
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return true;
+        }
+        
+        // Block specific shortcuts
+        if (e.key === 'u' || e.key === 'U' || // View source
+            e.key === 's' || e.key === 'S' || // Save page
+            e.key === 'p' || e.key === 'P' || // Print
+            e.key === 'shift' || e.key === 'Shift') { // Shift combinations
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+
+// Disable mouse wheel for zoom (only Ctrl+wheel)
+document.addEventListener('wheel', function(e) {
+    if (e.ctrlKey) {
+        e.preventDefault();
+        return false;
+    }
+}, { passive: false });
+
+// Disable pinch zoom on mobile (only aggressive zoom)
+document.addEventListener('gesturestart', function(e) {
+    if (e.scale !== 1) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+// Disable double tap zoom on mobile (only aggressive)
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 200) { // Reduced from 300ms
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Disable text selection globally (but allow for inputs)
+document.addEventListener('selectstart', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return true;
+    }
+    e.preventDefault();
+    return false;
+});
+
+// Disable images context menu
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
         });
     });
 });
 
-// ===== SECURITY MEASURES COMPLETELY REMOVED =====
-// All security measures have been completely removed for development purposes
+// Disable iframe access
+if (window.top !== window.self) {
+    window.top.location = window.self.location;
+}
+
+// Disable web inspector (less aggressive)
+setInterval(() => {
+    const start = performance.now();
+    // debugger removed
+    const end = performance.now();
+    if (end - start > 200) { // Increased threshold
+        console.warn('Developer tools detected');
+    }
+}, 2000); // Increased interval 
