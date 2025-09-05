@@ -338,20 +338,29 @@ function saveAllChanges() {
     // Save WhatsApp data to Firebase Realtime Database
     if (typeof saveWhatsAppDataToFirebase === 'function') {
         console.log('Firebase fonksiyonu bulundu, kaydetme başlatılıyor...');
+        console.log('Kaydedilecek veri:', whatsappData);
+        
         saveWhatsAppDataToFirebase(whatsappData).then(success => {
+            console.log('Firebase kaydetme sonucu:', success);
             if (success) {
                 console.log('Firebase Realtime Database\'e kaydedildi - Cross-device sync aktif');
                 showNotification('WhatsApp ayarları Firebase\'de senkronize edildi!', 'success');
             } else {
-                console.error('Firebase kaydı başarısız');
+                console.error('Firebase kaydı başarısız - success: false döndü');
                 showNotification('Yerel kayıt başarılı, Firebase kaydı başarısız', 'warning');
             }
         }).catch(error => {
             console.error('Firebase kaydetme hatası:', error);
+            console.error('Hata detayları:', {
+                message: error.message,
+                code: error.code,
+                stack: error.stack
+            });
             showNotification('Firebase kaydetme hatası: ' + error.message, 'error');
         });
     } else {
         console.warn('saveWhatsAppDataToFirebase fonksiyonu bulunamadı, Firebase yüklenmemiş olabilir');
+        console.log('Mevcut window fonksiyonları:', Object.keys(window).filter(key => key.includes('firebase') || key.includes('Firebase')));
         // Fallback to server sync
         fetch('admin/save.php', {
             method: 'POST',
@@ -575,11 +584,36 @@ window.logoutAdmin = logoutAdmin;
 window.testFirebaseConnection = function() {
     console.log('Firebase bağlantı testi başlatılıyor...');
     
+    // Check Firebase SDK
     if (typeof firebase === 'undefined') {
         showNotification('Firebase SDK yüklenmemiş!', 'error');
         return;
     }
     
+    console.log('Firebase SDK mevcut:', firebase);
+    
+    // Check Firebase app
+    try {
+        const app = firebase.app();
+        console.log('Firebase app:', app);
+        console.log('Firebase app name:', app.name);
+    } catch (error) {
+        console.error('Firebase app hatası:', error);
+        showNotification('Firebase app hatası: ' + error.message, 'error');
+        return;
+    }
+    
+    // Check database
+    try {
+        const database = firebase.database();
+        console.log('Firebase database:', database);
+    } catch (error) {
+        console.error('Firebase database hatası:', error);
+        showNotification('Firebase database hatası: ' + error.message, 'error');
+        return;
+    }
+    
+    // Check functions
     if (typeof saveWhatsAppDataToFirebase === 'function') {
         showNotification('Firebase fonksiyonları mevcut!', 'success');
         
@@ -596,16 +630,21 @@ window.testFirebaseConnection = function() {
             }
         };
         
+        console.log('Test verisi hazırlandı:', testData);
+        
         saveWhatsAppDataToFirebase(testData).then(success => {
+            console.log('Firebase test sonucu:', success);
             if (success) {
                 showNotification('Firebase test başarılı! Veri kaydedildi.', 'success');
             } else {
                 showNotification('Firebase test başarısız!', 'error');
             }
         }).catch(error => {
+            console.error('Firebase test hatası:', error);
             showNotification('Firebase test hatası: ' + error.message, 'error');
         });
     } else {
+        console.error('saveWhatsAppDataToFirebase fonksiyonu bulunamadı');
         showNotification('Firebase fonksiyonları yüklenmemiş!', 'error');
     }
 };

@@ -13,23 +13,56 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+let app;
+try {
+    app = firebase.initializeApp(firebaseConfig);
+    console.log('Firebase başarıyla başlatıldı:', app.name);
+} catch (error) {
+    console.error('Firebase başlatma hatası:', error);
+    throw error;
+}
 
 // Initialize Firebase services
-const database = firebase.database();
-const auth = firebase.auth();
-const storage = firebase.storage();
+let database, auth, storage;
+try {
+    database = firebase.database();
+    auth = firebase.auth();
+    storage = firebase.storage();
+    console.log('Firebase servisleri başlatıldı');
+} catch (error) {
+    console.error('Firebase servisleri başlatma hatası:', error);
+    throw error;
+}
 
 // ===== FIREBASE REALTIME DATABASE FUNCTIONS =====
 
 // Save data to Firebase Realtime Database
 async function saveToFirebase(path, data) {
     try {
-        await database.ref(path).set(data);
-        console.log('Firebase Realtime Database\'e kaydedildi:', path);
+        console.log('Firebase\'e kaydediliyor:', { path, data });
+        
+        // Check if database is initialized
+        if (!database) {
+            throw new Error('Firebase database not initialized');
+        }
+        
+        // Check if ref is available
+        const ref = database.ref(path);
+        if (!ref) {
+            throw new Error('Firebase ref not available');
+        }
+        
+        await ref.set(data);
+        console.log('Firebase Realtime Database\'e başarıyla kaydedildi:', path);
         return true;
     } catch (error) {
         console.error('Firebase kaydetme hatası:', error);
+        console.error('Hata detayları:', {
+            message: error.message,
+            code: error.code,
+            path: path,
+            data: data
+        });
         return false;
     }
 }
