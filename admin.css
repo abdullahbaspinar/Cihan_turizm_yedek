@@ -530,6 +530,40 @@ body {
     font-size: inherit;
 }
 
+.firebase-steps {
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.firebase-steps h5 {
+    color: #c53030;
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+}
+
+.firebase-steps ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.firebase-steps li {
+    margin: 0.5rem 0;
+    color: #2d3748;
+    line-height: 1.6;
+}
+
+.firebase-steps a {
+    color: #3182ce;
+    text-decoration: underline;
+}
+
+.firebase-steps a:hover {
+    color: #2c5282;
+}
+
 .test-buttons {
     display: flex;
     gap: 1rem;

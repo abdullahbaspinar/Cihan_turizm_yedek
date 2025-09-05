@@ -60,6 +60,8 @@ async function saveToFirebase(path, data) {
         if (error.code === 'permission_denied') {
             console.error('Firebase permission hatası - Database kurallarını kontrol edin!');
             console.error('Gerekli kurallar: {"rules": {"' + path + '": {".write": true, ".read": true}}}');
+            console.error('Firebase Console\'da Rules sekmesine gidin ve kuralları güncelleyin!');
+            console.error('URL: https://console.firebase.google.com/project/cihan-turizm/database/cihan-turizm-default-rtdb/rules');
         }
         console.error('Hata detayları:', {
             message: error.message,

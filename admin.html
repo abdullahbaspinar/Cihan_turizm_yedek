@@ -261,20 +261,28 @@
                                         <li>3. Console'da (F12) detaylı logları kontrol edin</li>
                                         <li>4. Firebase Console'da database kurallarını kontrol edin</li>
                                     </ul>
-                                    <p><strong>Firebase Database Kuralları:</strong></p>
-                                    <pre><code>{
+                                    <div class="firebase-steps">
+                                        <h5>Firebase Database Kurallarını Güncelleme:</h5>
+                                        <ol>
+                                            <li><strong>Firebase Console'a gidin:</strong> <a href="https://console.firebase.google.com/project/cihan-turizm/database/cihan-turizm-default-rtdb/rules" target="_blank" rel="noopener">https://console.firebase.google.com/project/cihan-turizm/database/cihan-turizm-default-rtdb/rules</a></li>
+                                            <li><strong>Rules sekmesinde</strong> mevcut kuralları silin</li>
+                                            <li><strong>Aşağıdaki kuralları yapıştırın:</strong></li>
+                                        </ol>
+                                        <pre><code>{
   "rules": {
     "whatsapp": {
-      ".write": true,
-      ".read": true
+      ".read": true,
+      ".write": true
     },
     "test": {
-      ".write": true,
-      ".read": true
+      ".read": true,
+      ".write": true
     }
   }
 }</code></pre>
-                                    <p><strong>Firebase Console'da Rules sekmesine gidin ve yukarıdaki kuralları yapıştırın!</strong></p>
+                                        <p><strong>4. "Publish" butonuna tıklayın</strong></p>
+                                        <p><strong>5. Bu sayfayı yenileyin ve test edin</strong></p>
+                                    </div>
                                 </div>
                                 <div class="test-buttons">
                                     <button class="test-btn" onclick="testSimpleFirebase()">
