@@ -276,9 +276,6 @@ function saveAllChanges() {
     
     localStorage.setItem('whatsapp_config', JSON.stringify(whatsappData));
     
-    // Save last update time
-    localStorage.setItem('last_update_time', new Date().toISOString());
-    
     // Debug log
     console.log('WhatsApp ayarları kaydedildi:', whatsappData);
     
@@ -390,18 +387,6 @@ function saveAllChanges() {
 
 // ===== DASHBOARD =====
 function updateDashboard() {
-    // Update last update time - get from localStorage or use current time
-    const lastUpdateElement = document.getElementById('last-update-time');
-    if (lastUpdateElement) {
-        const lastUpdateTime = localStorage.getItem('last_update_time');
-        if (lastUpdateTime) {
-            const updateDate = new Date(lastUpdateTime);
-            lastUpdateElement.textContent = updateDate.toLocaleString('tr-TR');
-        } else {
-            lastUpdateElement.textContent = new Date().toLocaleString('tr-TR');
-        }
-    }
-    
     // Update current WhatsApp number
     const whatsappData = localStorage.getItem('whatsapp_config');
     if (whatsappData) {
