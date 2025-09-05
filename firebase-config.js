@@ -57,6 +57,10 @@ async function saveToFirebase(path, data) {
         return true;
     } catch (error) {
         console.error('Firebase kaydetme hatası:', error);
+        if (error.code === 'permission_denied') {
+            console.error('Firebase permission hatası - Database kurallarını kontrol edin!');
+            console.error('Gerekli kurallar: {"rules": {"' + path + '": {".write": true, ".read": true}}}');
+        }
         console.error('Hata detayları:', {
             message: error.message,
             code: error.code,
@@ -80,6 +84,10 @@ async function loadFromFirebase(path) {
         }
     } catch (error) {
         console.error('Firebase yükleme hatası:', error);
+        if (error.code === 'permission_denied') {
+            console.error('Firebase permission hatası - Database kurallarını kontrol edin!');
+            console.error('Gerekli kurallar: {"rules": {"' + path + '": {".write": true, ".read": true}}}');
+        }
         return null;
     }
 }
@@ -94,6 +102,10 @@ function listenForFirebaseUpdates(path, callback) {
         }
     }, (error) => {
         console.error('Firebase dinleme hatası:', error);
+        if (error.code === 'permission_denied') {
+            console.error('Firebase permission hatası - Database kurallarını kontrol edin!');
+            console.error('Gerekli kurallar: {"rules": {"' + path + '": {".write": true, ".read": true}}}');
+        }
     });
 }
 

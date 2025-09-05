@@ -675,6 +675,9 @@ window.testSimpleFirebase = function() {
     }
 };
 
+// Export the function to global scope
+window.testSimpleFirebase = window.testSimpleFirebase;
+
 // Test WhatsApp number function
 window.testWhatsAppNumber = function() {
     const whatsappData = localStorage.getItem('whatsapp_config');

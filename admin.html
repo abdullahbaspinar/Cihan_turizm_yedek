@@ -261,7 +261,20 @@
                                         <li>3. Console'da (F12) detaylı logları kontrol edin</li>
                                         <li>4. Firebase Console'da database kurallarını kontrol edin</li>
                                     </ul>
-                                    <p><strong>Firebase Database Kuralları:</strong> <code>{"rules": {"whatsapp": {".write": true, ".read": true}}}</code></p>
+                                    <p><strong>Firebase Database Kuralları:</strong></p>
+                                    <pre><code>{
+  "rules": {
+    "whatsapp": {
+      ".write": true,
+      ".read": true
+    },
+    "test": {
+      ".write": true,
+      ".read": true
+    }
+  }
+}</code></pre>
+                                    <p><strong>Firebase Console'da Rules sekmesine gidin ve yukarıdaki kuralları yapıştırın!</strong></p>
                                 </div>
                                 <div class="test-buttons">
                                     <button class="test-btn" onclick="testSimpleFirebase()">
