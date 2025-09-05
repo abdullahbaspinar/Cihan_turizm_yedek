@@ -43,7 +43,7 @@
     <aside class="admin-sidebar" id="admin-sidebar">
         <div class="sidebar-header">
             <img src="assets/ercihanlogo-transparent.png" alt="Cihanturizm Logo" class="sidebar-logo">
-            <h3>Admin Panel</h3>
+            <h3>Admin</h3>
             <button class="sidebar-toggle" id="sidebar-toggle">
                 <span class="material-icons">menu</span>
             </button>
@@ -56,14 +56,14 @@
             </a>
             <a href="#whatsapp" class="nav-item" data-section="whatsapp">
                 <span class="material-icons">phone</span>
-                <span>WhatsApp Ayarları</span>
+                <span>WhatsApp</span>
             </a>
         </nav>
         
         <div class="sidebar-footer">
             <button class="logout-btn" onclick="logoutAdmin()">
                 <span class="material-icons">logout</span>
-                <span>Çıkış Yap</span>
+                <span>Çıkış</span>
             </button>
         </div>
     </aside>
@@ -76,11 +76,11 @@
                 <div class="header-actions">
                     <button class="save-all-btn" onclick="saveAllChanges()">
                         <span class="material-icons">save</span>
-                        Tüm Değişiklikleri Kaydet
+                        Kaydet
                     </button>
                     <a href="index.html" class="view-site-btn">
                         <span class="material-icons">visibility</span>
-                        Siteyi Görüntüle
+                        Site
                     </a>
                 </div>
             </div>
@@ -90,10 +90,6 @@
             <!-- Dashboard Section -->
             <section id="dashboard" class="content-section active">
                 <div class="dashboard-grid">
-
-                    
-
-                    
                     <div class="dashboard-card">
                         <div class="card-icon">
                             <span class="material-icons">schedule</span>
@@ -122,10 +118,6 @@
                             <span class="material-icons">phone</span>
                             WhatsApp Ayarla
                         </button>
-                        <button class="action-btn" onclick="previewChanges()">
-                            <span class="material-icons">preview</span>
-                            Değişiklikleri Önizle
-                        </button>
                     </div>
                 </div>
             </section>
@@ -138,96 +130,125 @@
             <section id="whatsapp" class="content-section">
                 <div class="section-header">
                     <h2>WhatsApp Ayarları</h2>
-                    <p>WhatsApp numaralarını ve mesajlarını yönetin</p>
+                    <p>WhatsApp numaralarını ve mesaj şablonlarını yönetin</p>
                 </div>
                 
                 <div class="whatsapp-settings">
                     <div class="settings-grid">
                         <div class="day-settings">
-                            <h3>Günlük Numaralar</h3>
-                            <p class="settings-info">Gece numaraları bir sonraki güne kadar geçerlidir. Örneğin: Pazartesi gecesi = Pazartesi 18:00 - Salı 09:00. Numaraları sadece rakam olarak girin (örn: 905555555550).</p>
-                            <div class="day-inputs">
+                            <div class="settings-card">
+                                <h3>Günlük Numaralar</h3>
+                                <p class="card-description">Her gün için sabah ve gece numaraları belirleyin</p>
+                                <div class="day-inputs">
                                 <div class="day-input">
                                     <label>Pazartesi</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Pazartesi-Salı Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="monday-morning" placeholder="905551234567">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="monday-evening" placeholder="905551234568">
+                                        </div>
                                     </div>
-                                    <input type="text" id="monday-morning" placeholder="Örn: 905555555550">
-                                    <input type="text" id="monday-evening" placeholder="Örn: 905555555551">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Pazartesi 18:00'dan Salı 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
                                 <div class="day-input">
                                     <label>Salı</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Salı-Çarşamba Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="tuesday-morning" placeholder="905551234569">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="tuesday-evening" placeholder="905551234570">
+                                        </div>
                                     </div>
-                                    <input type="text" id="tuesday-morning" placeholder="Örn: 905555555552">
-                                    <input type="text" id="tuesday-evening" placeholder="Örn: 905555555553">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Salı 18:00'dan Çarşamba 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
                                 <div class="day-input">
                                     <label>Çarşamba</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Çarşamba-Perşembe Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="wednesday-morning" placeholder="905551234571">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="wednesday-evening" placeholder="905551234572">
+                                        </div>
                                     </div>
-                                    <input type="text" id="wednesday-morning" placeholder="Örn: 905555555554">
-                                    <input type="text" id="wednesday-evening" placeholder="Örn: 905555555555">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Çarşamba 18:00'dan Perşembe 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
                                 <div class="day-input">
                                     <label>Perşembe</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Perşembe-Cuma Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="thursday-morning" placeholder="905551234573">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="thursday-evening" placeholder="905551234574">
+                                        </div>
                                     </div>
-                                    <input type="text" id="thursday-morning" placeholder="Örn: 905555555556">
-                                    <input type="text" id="thursday-evening" placeholder="Örn: 905555555557">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Perşembe 18:00'dan Cuma 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
                                 <div class="day-input">
                                     <label>Cuma</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Cuma-Cumartesi Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="friday-morning" placeholder="905551234575">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="friday-evening" placeholder="905551234576">
+                                        </div>
                                     </div>
-                                    <input type="text" id="friday-morning" placeholder="Örn: 905555555558">
-                                    <input type="text" id="friday-evening" placeholder="Örn: 905555555559">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Cuma 18:00'dan Cumartesi 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
                                 <div class="day-input">
                                     <label>Cumartesi</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Cumartesi-Pazar Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="saturday-morning" placeholder="905551234577">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="saturday-evening" placeholder="905551234578">
+                                        </div>
                                     </div>
-                                    <input type="text" id="saturday-morning" placeholder="Örn: 905555555560">
-                                    <input type="text" id="saturday-evening" placeholder="Örn: 905555555561">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Cumartesi 18:00'dan Pazar 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
                                 <div class="day-input">
                                     <label>Pazar</label>
-                                    <div class="time-labels">
-                                        <span class="time-label">Sabah (09:00-18:00)</span>
-                                        <span class="time-label">Gece (18:00-09:00) - Pazar-Pazartesi Gecesi</span>
+                                    <div class="input-group">
+                                        <div class="input-field">
+                                            <span class="field-label">Sabah (09:00-18:00)</span>
+                                            <input type="text" id="sunday-morning" placeholder="905551234579">
+                                        </div>
+                                        <div class="input-field">
+                                            <span class="field-label">Gece (18:00-09:00)</span>
+                                            <input type="text" id="sunday-evening" placeholder="905551234580">
+                                        </div>
                                     </div>
-                                    <input type="text" id="sunday-morning" placeholder="Örn: 905555555562">
-                                    <input type="text" id="sunday-evening" placeholder="Örn: 905555555563">
-                                    <div class="time-explanation">
+                                    <div class="day-explanation">
                                         <small>Gece numarası: Pazar 18:00'dan Pazartesi 09:00'a kadar geçerli</small>
                                     </div>
                                 </div>
@@ -235,71 +256,25 @@
                         </div>
                         
                         <div class="message-settings">
-                            <h3>Mesaj Ayarları</h3>
-                            <div class="message-inputs">
-                                <div class="message-input">
-                                    <label>Vize Danışmanlığı Mesajı</label>
-                                    <textarea id="visa-message" rows="3" placeholder="Merhaba! Vize danışmanlığı hizmetleri hakkında bilgi almak istiyorum."></textarea>
-                                </div>
-                                <div class="message-input">
-                                    <label>Biletleme Hizmetleri Mesajı</label>
-                                    <textarea id="ticketing-message" rows="3" placeholder="Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum."></textarea>
-                                </div>
-                                <div class="message-input">
-                                    <label>İletişim Mesajı</label>
-                                    <textarea id="contact-message" rows="3" placeholder="Merhaba! Cihanturizm ile iletişime geçmek istiyorum."></textarea>
+                            <div class="settings-card">
+                                <h3>Mesaj Şablonları</h3>
+                                <p class="card-description">Otomatik mesajları belirleyin</p>
+                                <div class="message-inputs">
+                                    <div class="message-input">
+                                        <label>Vize Danışmanlığı</label>
+                                        <textarea id="visa-message" rows="3" placeholder="Merhaba! Vize danışmanlığı hizmetleri hakkında bilgi almak istiyorum."></textarea>
+                                    </div>
+                                    <div class="message-input">
+                                        <label>Biletleme Hizmetleri</label>
+                                        <textarea id="ticketing-message" rows="3" placeholder="Merhaba! Biletleme hizmetleri hakkında bilgi almak istiyorum."></textarea>
+                                    </div>
+                                    <div class="message-input">
+                                        <label>Genel İletişim</label>
+                                        <textarea id="contact-message" rows="3" placeholder="Merhaba! Cihanturizm ile iletişime geçmek istiyorum."></textarea>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="test-section">
-                                <h4>Test</h4>
-                                <div class="firebase-info">
-                                    <p><strong>Firebase Sorun Giderme:</strong></p>
-                                    <ul>
-                                        <li>1. <strong>Basit Firebase Testi</strong> - Temel yazma işlemini test eder</li>
-                                        <li>2. <strong>Firebase Bağlantısını Test Et</strong> - WhatsApp verilerini test eder</li>
-                                        <li>3. Console'da (F12) detaylı logları kontrol edin</li>
-                                        <li>4. Firebase Console'da database kurallarını kontrol edin</li>
-                                    </ul>
-                                    <div class="firebase-steps">
-                                        <h5>Firebase Database Kurallarını Güncelleme:</h5>
-                                        <ol>
-                                            <li><strong>Firebase Console'a gidin:</strong> <a href="https://console.firebase.google.com/project/cihan-turizm/database/cihan-turizm-default-rtdb/rules" target="_blank" rel="noopener">https://console.firebase.google.com/project/cihan-turizm/database/cihan-turizm-default-rtdb/rules</a></li>
-                                            <li><strong>Rules sekmesinde</strong> mevcut kuralları silin</li>
-                                            <li><strong>Aşağıdaki kuralları yapıştırın:</strong></li>
-                                        </ol>
-                                        <pre><code>{
-  "rules": {
-    "whatsapp": {
-      ".read": true,
-      ".write": true
-    },
-    "test": {
-      ".read": true,
-      ".write": true
-    }
-  }
-}</code></pre>
-                                        <p><strong>4. "Publish" butonuna tıklayın</strong></p>
-                                        <p><strong>5. Bu sayfayı yenileyin ve test edin</strong></p>
-                                    </div>
-                                </div>
-                                <div class="test-buttons">
-                                    <button class="test-btn" onclick="testSimpleFirebase()">
-                                        <span class="material-icons">bug_report</span>
-                                        Basit Firebase Testi
-                                    </button>
-                                    <button class="test-btn" onclick="testFirebaseConnection()">
-                                        <span class="material-icons">cloud</span>
-                                        Firebase Bağlantısını Test Et
-                                    </button>
-                                    <button class="test-btn" onclick="testWhatsAppNumber()">
-                                        <span class="material-icons">phone</span>
-                                        Güncel WhatsApp Numarasını Test Et
-                                    </button>
-                                </div>
-                                <div id="test-result" class="test-result"></div>
-                            </div>
                         </div>
                     </div>
                 </div>

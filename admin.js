@@ -276,6 +276,9 @@ function saveAllChanges() {
     
     localStorage.setItem('whatsapp_config', JSON.stringify(whatsappData));
     
+    // Save last update time
+    localStorage.setItem('last_update_time', new Date().toISOString());
+    
     // Debug log
     console.log('WhatsApp ayarları kaydedildi:', whatsappData);
     
@@ -333,13 +336,11 @@ function saveAllChanges() {
     
     showNotification('Tüm değişiklikler başarıyla kaydedildi!', 'success');
     
-
+    // Update dashboard to show new last update time
+    updateDashboard();
 
     // Save WhatsApp data to Firebase Realtime Database
     if (typeof saveWhatsAppDataToFirebase === 'function') {
-        console.log('Firebase fonksiyonu bulundu, kaydetme başlatılıyor...');
-        console.log('Kaydedilecek veri:', whatsappData);
-        
         // Firebase kaydetme işlemini timeout ile sınırla
         const firebasePromise = saveWhatsAppDataToFirebase(whatsappData);
         const timeoutPromise = new Promise((resolve) => {
@@ -347,26 +348,17 @@ function saveAllChanges() {
         });
         
         Promise.race([firebasePromise, timeoutPromise]).then(success => {
-            console.log('Firebase kaydetme sonucu:', success);
             if (success) {
-                console.log('Firebase Realtime Database\'e kaydedildi - Cross-device sync aktif');
-                showNotification('WhatsApp ayarları Firebase\'de senkronize edildi!', 'success');
+                showNotification('WhatsApp ayarları tüm cihazlarda senkronize edildi!', 'success');
             } else {
-                console.error('Firebase kaydı başarısız veya timeout');
-                showNotification('Yerel kayıt başarılı, Firebase kaydı başarısız', 'warning');
+                showNotification('Yerel kayıt başarılı, senkronizasyon başarısız', 'warning');
             }
         }).catch(error => {
             console.error('Firebase kaydetme hatası:', error);
-            console.error('Hata detayları:', {
-                message: error.message,
-                code: error.code,
-                stack: error.stack
-            });
-            showNotification('Firebase kaydetme hatası: ' + error.message, 'error');
+            showNotification('Senkronizasyon hatası: ' + error.message, 'error');
         });
     } else {
-        console.warn('saveWhatsAppDataToFirebase fonksiyonu bulunamadı, Firebase yüklenmemiş olabilir');
-        console.log('Mevcut window fonksiyonları:', Object.keys(window).filter(key => key.includes('firebase') || key.includes('Firebase')));
+        console.warn('Firebase yüklenmemiş, sadece yerel kayıt yapılıyor');
         // Fallback to server sync
         fetch('admin/save.php', {
             method: 'POST',
@@ -398,10 +390,16 @@ function saveAllChanges() {
 
 // ===== DASHBOARD =====
 function updateDashboard() {
-    // Update last update time
+    // Update last update time - get from localStorage or use current time
     const lastUpdateElement = document.getElementById('last-update-time');
     if (lastUpdateElement) {
-        lastUpdateElement.textContent = new Date().toLocaleString('tr-TR');
+        const lastUpdateTime = localStorage.getItem('last_update_time');
+        if (lastUpdateTime) {
+            const updateDate = new Date(lastUpdateTime);
+            lastUpdateElement.textContent = updateDate.toLocaleString('tr-TR');
+        } else {
+            lastUpdateElement.textContent = new Date().toLocaleString('tr-TR');
+        }
     }
     
     // Update current WhatsApp number
@@ -586,171 +584,3 @@ window.showWhatsAppSettings = showWhatsAppSettings;
 window.previewChanges = previewChanges;
 window.logoutAdmin = logoutAdmin;
 
-// Test Firebase connection function
-window.testFirebaseConnection = function() {
-    console.log('Firebase bağlantı testi başlatılıyor...');
-    
-    // Check Firebase SDK
-    if (typeof firebase === 'undefined') {
-        showNotification('Firebase SDK yüklenmemiş!', 'error');
-        return;
-    }
-    
-    console.log('Firebase SDK mevcut:', firebase);
-    
-    // Check Firebase app
-    try {
-        const app = firebase.app();
-        console.log('Firebase app:', app);
-        console.log('Firebase app name:', app.name);
-    } catch (error) {
-        console.error('Firebase app hatası:', error);
-        showNotification('Firebase app hatası: ' + error.message, 'error');
-        return;
-    }
-    
-    // Check database
-    try {
-        const database = firebase.database();
-        console.log('Firebase database:', database);
-    } catch (error) {
-        console.error('Firebase database hatası:', error);
-        showNotification('Firebase database hatası: ' + error.message, 'error');
-        return;
-    }
-    
-    // Check functions
-    if (typeof saveWhatsAppDataToFirebase === 'function') {
-        showNotification('Firebase fonksiyonları mevcut!', 'success');
-        
-        // Test data
-        const testData = {
-            dailyNumbers: {
-                0: { morning: '905551234567', evening: '905551234568' },
-                1: { morning: '905551234569', evening: '905551234570' }
-            },
-            messages: {
-                visa: 'Test mesajı - Vize',
-                ticketing: 'Test mesajı - Biletleme',
-                contact: 'Test mesajı - İletişim'
-            }
-        };
-        
-        console.log('Test verisi hazırlandı:', testData);
-        
-        saveWhatsAppDataToFirebase(testData).then(success => {
-            console.log('Firebase test sonucu:', success);
-            if (success) {
-                showNotification('Firebase test başarılı! Veri kaydedildi.', 'success');
-            } else {
-                showNotification('Firebase test başarısız!', 'error');
-            }
-        }).catch(error => {
-            console.error('Firebase test hatası:', error);
-            showNotification('Firebase test hatası: ' + error.message, 'error');
-        });
-    } else {
-        console.error('saveWhatsAppDataToFirebase fonksiyonu bulunamadı');
-        showNotification('Firebase fonksiyonları yüklenmemiş!', 'error');
-    }
-};
-
-// Simple Firebase test function
-window.testSimpleFirebase = function() {
-    console.log('Basit Firebase testi başlatılıyor...');
-    
-    if (typeof testSimpleFirebaseWrite === 'function') {
-        testSimpleFirebaseWrite().then(success => {
-            if (success) {
-                showNotification('Basit Firebase testi başarılı!', 'success');
-            } else {
-                showNotification('Basit Firebase testi başarısız!', 'error');
-            }
-        }).catch(error => {
-            console.error('Basit Firebase test hatası:', error);
-            showNotification('Basit Firebase test hatası: ' + error.message, 'error');
-        });
-    } else {
-        showNotification('testSimpleFirebaseWrite fonksiyonu bulunamadı!', 'error');
-    }
-};
-
-// Export the function to global scope
-window.testSimpleFirebase = window.testSimpleFirebase;
-
-// Test WhatsApp number function
-window.testWhatsAppNumber = function() {
-    const whatsappData = localStorage.getItem('whatsapp_config');
-    if (!whatsappData) {
-        showNotification('WhatsApp ayarları bulunamadı!', 'error');
-        return;
-    }
-    
-    const whatsapp = JSON.parse(whatsappData);
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const hour = now.getHours();
-    
-    // Gece saatlerinde (18:00-09:00) bir önceki günün gece numarası kullanılmalı
-    let effectiveDayOfWeek = dayOfWeek;
-    let isNightTime = false;
-    
-    if (hour >= 18 || hour < 9) {
-        isNightTime = true;
-        // Gece saatlerinde bir önceki günün gece numarası kullanılır
-        if (hour >= 18) {
-            // 18:00'dan sonra aynı günün gece numarası
-            effectiveDayOfWeek = dayOfWeek;
-        } else {
-            // 09:00'dan önce bir önceki günün gece numarası
-            effectiveDayOfWeek = (dayOfWeek + 6) % 7; // Bir önceki gün
-        }
-    }
-    
-    // Admin panelindeki index'e çevir
-    let adminIndex;
-    if (effectiveDayOfWeek === 0) {
-        adminIndex = 6;
-    } else {
-        adminIndex = effectiveDayOfWeek - 1;
-    }
-    
-    const dayNames = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
-    const currentDayName = dayNames[adminIndex];
-    const isDayTime = hour >= 9 && hour < 18;
-    const timeType = isDayTime ? 'Sabah' : 'Gece';
-    
-    const currentNumber = isDayTime 
-        ? whatsapp.dailyNumbers[adminIndex]?.morning 
-        : whatsapp.dailyNumbers[adminIndex]?.evening;
-    
-    const resultDiv = document.getElementById('test-result');
-    if (resultDiv) {
-        resultDiv.innerHTML = `
-            <div class="test-info">
-                <p><strong>Gerçek Gün:</strong> ${dayNames[dayOfWeek] || 'Bilinmiyor'}</p>
-                <p><strong>Hesaplanan Gün:</strong> ${currentDayName}</p>
-                <p><strong>Saat:</strong> ${hour}:00</p>
-                <p><strong>Zaman:</strong> ${timeType} (${isDayTime ? '09:00-18:00' : '18:00-09:00'})</p>
-                <p><strong>Gece Saati:</strong> ${isNightTime ? 'Evet' : 'Hayır'}</p>
-                <p><strong>Admin Index:</strong> ${adminIndex}</p>
-                <p><strong>Aktif Numara:</strong> ${currentNumber || 'Numara bulunamadı'}</p>
-            </div>
-        `;
-    }
-    
-    console.log('WhatsApp Test Sonucu:', {
-        originalDayOfWeek: dayOfWeek,
-        effectiveDayOfWeek: effectiveDayOfWeek,
-        adminIndex: adminIndex,
-        currentDayName: currentDayName,
-        hour: hour,
-        isNightTime: isNightTime,
-        isDayTime: isDayTime,
-        timeType: timeType,
-        currentNumber: currentNumber,
-        allNumbers: whatsapp.dailyNumbers
-    });
-    
-    showNotification('Test tamamlandı! Sonuçları aşağıda görebilirsiniz.', 'success');
-}; 
