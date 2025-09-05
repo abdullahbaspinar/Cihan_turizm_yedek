@@ -1,0 +1,27 @@
+{
+  "name": "Cihanturizm - Vize Danışmanlığı",
+  "short_name": "Cihanturizm",
+  "description": "Profesyonel vize danışmanlığı ve seyahat çözümleri",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D47A1",
+  "theme_color": "#0D47A1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/ercihanlogo-transparent.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/ercihanlogo-transparent.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["travel", "business", "productivity"],
+  "lang": "tr",
+  "dir": "ltr"
+}

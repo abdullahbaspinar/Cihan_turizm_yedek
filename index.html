@@ -8,6 +8,14 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.google.com; connect-src 'self' https: wss:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+    
     <!-- Primary Meta Tags -->
     <title>Cihanturizm | Profesyonel Vize Danışmanlığı ve seyehat çözümleri</title>
     <meta name="title" content="Cihanturizm | Profesyonel Vize Danışmanlığı ve seyehat çözümleri">
@@ -67,6 +75,13 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="assets/ercihanlogo-transparent.png">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0D47A1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cihanturizm">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/ercihanlogo-transparent.png">
     <link rel="apple-touch-icon" href="assets/ercihanlogo-transparent.png">
     

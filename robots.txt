@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Disallow admin panel
+Disallow: /admin.html
+Disallow: /admin.css
+Disallow: /admin.js
+Disallow: /firebase-config.js
+
+# Allow main pages
+Allow: /index.html
+Allow: /style.css
+Allow: /script.js
+Allow: /assets/
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
