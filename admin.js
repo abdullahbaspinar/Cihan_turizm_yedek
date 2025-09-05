@@ -335,8 +335,9 @@ function saveAllChanges() {
     
 
 
-    // Save WhatsApp data to Firebase Realtime Database (optional)
+    // Save WhatsApp data to Firebase Realtime Database
     if (typeof saveWhatsAppDataToFirebase === 'function') {
+        console.log('Firebase fonksiyonu bulundu, kaydetme başlatılıyor...');
         saveWhatsAppDataToFirebase(whatsappData).then(success => {
             if (success) {
                 console.log('Firebase Realtime Database\'e kaydedildi - Cross-device sync aktif');
@@ -345,8 +346,12 @@ function saveAllChanges() {
                 console.error('Firebase kaydı başarısız');
                 showNotification('Yerel kayıt başarılı, Firebase kaydı başarısız', 'warning');
             }
+        }).catch(error => {
+            console.error('Firebase kaydetme hatası:', error);
+            showNotification('Firebase kaydetme hatası: ' + error.message, 'error');
         });
     } else {
+        console.warn('saveWhatsAppDataToFirebase fonksiyonu bulunamadı, Firebase yüklenmemiş olabilir');
         // Fallback to server sync
         fetch('admin/save.php', {
             method: 'POST',
@@ -508,19 +513,33 @@ function initializeFirebase() {
         return;
     }
     
+    console.log('Firebase SDK yüklendi, Firebase fonksiyonları kontrol ediliyor...');
+    
+    // Check if Firebase functions are available
+    if (typeof saveWhatsAppDataToFirebase === 'function') {
+        console.log('Firebase WhatsApp fonksiyonları mevcut');
+    } else {
+        console.warn('Firebase WhatsApp fonksiyonları yüklenmedi');
+    }
+    
     // Load WhatsApp data from Firebase
     if (typeof loadWhatsAppDataFromFirebase === 'function') {
         loadWhatsAppDataFromFirebase().then(success => {
             if (success) {
                 showNotification('Firebase\'den WhatsApp verileri yüklendi!', 'success');
                 updateDashboard();
+            } else {
+                console.log('Firebase\'den veri yüklenemedi, yerel veriler kullanılıyor');
             }
+        }).catch(error => {
+            console.error('Firebase veri yükleme hatası:', error);
         });
     }
     
     // Start real-time sync for WhatsApp
     if (typeof listenForWhatsAppUpdates === 'function') {
         listenForWhatsAppUpdates();
+        console.log('Firebase real-time sync başlatıldı');
     }
 }
 
@@ -551,6 +570,45 @@ window.saveAllChanges = saveAllChanges;
 window.showWhatsAppSettings = showWhatsAppSettings;
 window.previewChanges = previewChanges;
 window.logoutAdmin = logoutAdmin;
+
+// Test Firebase connection function
+window.testFirebaseConnection = function() {
+    console.log('Firebase bağlantı testi başlatılıyor...');
+    
+    if (typeof firebase === 'undefined') {
+        showNotification('Firebase SDK yüklenmemiş!', 'error');
+        return;
+    }
+    
+    if (typeof saveWhatsAppDataToFirebase === 'function') {
+        showNotification('Firebase fonksiyonları mevcut!', 'success');
+        
+        // Test data
+        const testData = {
+            dailyNumbers: {
+                0: { morning: '905551234567', evening: '905551234568' },
+                1: { morning: '905551234569', evening: '905551234570' }
+            },
+            messages: {
+                visa: 'Test mesajı - Vize',
+                ticketing: 'Test mesajı - Biletleme',
+                contact: 'Test mesajı - İletişim'
+            }
+        };
+        
+        saveWhatsAppDataToFirebase(testData).then(success => {
+            if (success) {
+                showNotification('Firebase test başarılı! Veri kaydedildi.', 'success');
+            } else {
+                showNotification('Firebase test başarısız!', 'error');
+            }
+        }).catch(error => {
+            showNotification('Firebase test hatası: ' + error.message, 'error');
+        });
+    } else {
+        showNotification('Firebase fonksiyonları yüklenmemiş!', 'error');
+    }
+};
 
 // Test WhatsApp number function
 window.testWhatsAppNumber = function() {

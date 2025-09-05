@@ -253,10 +253,16 @@
                             
                             <div class="test-section">
                                 <h4>Test</h4>
-                                <button class="test-btn" onclick="testWhatsAppNumber()">
-                                    <span class="material-icons">phone</span>
-                                    Güncel WhatsApp Numarasını Test Et
-                                </button>
+                                <div class="test-buttons">
+                                    <button class="test-btn" onclick="testFirebaseConnection()">
+                                        <span class="material-icons">cloud</span>
+                                        Firebase Bağlantısını Test Et
+                                    </button>
+                                    <button class="test-btn" onclick="testWhatsAppNumber()">
+                                        <span class="material-icons">phone</span>
+                                        Güncel WhatsApp Numarasını Test Et
+                                    </button>
+                                </div>
                                 <div id="test-result" class="test-result"></div>
                             </div>
                         </div>
@@ -279,10 +285,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
     
-    <!-- Firebase Configuration -->
+    <!-- Firebase Configuration - Must load before admin.js -->
     <script src="firebase-config.js"></script>
     
-    <!-- Scripts -->
+    <!-- Admin Scripts - Load after Firebase config -->
     <script src="admin.js"></script>
 </body>
 </html> 

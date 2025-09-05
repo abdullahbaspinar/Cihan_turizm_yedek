@@ -176,15 +176,18 @@ async function loadWhatsAppDataFromFirebase() {
 // Update WhatsApp form fields with loaded data
 function updateWhatsAppFormFields(data) {
     if (data.dailyNumbers) {
-        Object.keys(data.dailyNumbers).forEach(index => {
+        Object.keys(data.dailyNumbers).forEach(indexStr => {
+            const index = parseInt(indexStr);
             const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
             const dayName = dayNames[index];
             
-            const morningInput = document.getElementById(`${dayName}-morning`);
-            const eveningInput = document.getElementById(`${dayName}-evening`);
-            
-            if (morningInput) morningInput.value = data.dailyNumbers[index].morning || '';
-            if (eveningInput) eveningInput.value = data.dailyNumbers[index].evening || '';
+            if (dayName) {
+                const morningInput = document.getElementById(`${dayName}-morning`);
+                const eveningInput = document.getElementById(`${dayName}-evening`);
+                
+                if (morningInput) morningInput.value = data.dailyNumbers[index].morning || '';
+                if (eveningInput) eveningInput.value = data.dailyNumbers[index].evening || '';
+            }
         });
     }
     
