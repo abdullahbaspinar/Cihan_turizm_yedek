@@ -477,6 +477,40 @@ body {
     margin-bottom: 1rem;
 }
 
+.firebase-info {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.firebase-info p {
+    margin: 0 0 0.5rem 0;
+    color: #2d3748;
+}
+
+.firebase-info ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.firebase-info li {
+    margin: 0.25rem 0;
+    color: #4a5568;
+}
+
+.firebase-info code {
+    background: #edf2f7;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    color: #e53e3e;
+}
+
 .test-buttons {
     display: flex;
     gap: 1rem;

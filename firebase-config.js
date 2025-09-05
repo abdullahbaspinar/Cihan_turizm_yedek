@@ -130,14 +130,25 @@ async function deleteImageFromFirebase(path) {
 
 // Save WhatsApp data to Firebase
 async function saveWhatsAppDataToFirebase(whatsappData) {
+    console.log('saveWhatsAppDataToFirebase çağrıldı');
+    console.log('Gelen veri:', whatsappData);
+    
     const data = {
         dailyNumbers: whatsappData.dailyNumbers,
         messages: whatsappData.messages,
         lastUpdated: new Date().toISOString()
     };
     
-    const success = await saveToFirebase('/whatsapp', data);
-    return success;
+    console.log('Firebase\'e gönderilecek veri:', data);
+    
+    try {
+        const success = await saveToFirebase('/whatsapp', data);
+        console.log('saveToFirebase sonucu:', success);
+        return success;
+    } catch (error) {
+        console.error('saveWhatsAppDataToFirebase hatası:', error);
+        return false;
+    }
 }
 
 // ===== CONTENT DATA MANAGEMENT =====
@@ -290,6 +301,37 @@ function onAuthStateChanged(callback) {
     auth.onAuthStateChanged(callback);
 }
 
+// ===== SIMPLE FIREBASE TEST =====
+async function testSimpleFirebaseWrite() {
+    console.log('Basit Firebase yazma testi başlatılıyor...');
+    
+    try {
+        // Test verisi
+        const testData = {
+            test: true,
+            timestamp: new Date().toISOString(),
+            message: 'Firebase test yazısı'
+        };
+        
+        console.log('Test verisi:', testData);
+        
+        // Firebase'e yazma
+        const ref = database.ref('/test');
+        await ref.set(testData);
+        
+        console.log('Firebase yazma başarılı!');
+        return true;
+    } catch (error) {
+        console.error('Firebase yazma hatası:', error);
+        console.error('Hata detayları:', {
+            message: error.message,
+            code: error.code,
+            stack: error.stack
+        });
+        return false;
+    }
+}
+
 // ===== EXPORT FUNCTIONS =====
 window.saveToFirebase = saveToFirebase;
 window.loadFromFirebase = loadFromFirebase;
@@ -304,4 +346,5 @@ window.loadContentDataFromFirebase = loadContentDataFromFirebase;
 window.listenForContentUpdates = listenForContentUpdates;
 window.signInWithEmail = signInWithEmail;
 window.signOut = signOut;
-window.onAuthStateChanged = onAuthStateChanged; 
+window.onAuthStateChanged = onAuthStateChanged;
+window.testSimpleFirebaseWrite = testSimpleFirebaseWrite; 

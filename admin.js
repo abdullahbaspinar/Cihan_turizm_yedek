@@ -340,13 +340,19 @@ function saveAllChanges() {
         console.log('Firebase fonksiyonu bulundu, kaydetme başlatılıyor...');
         console.log('Kaydedilecek veri:', whatsappData);
         
-        saveWhatsAppDataToFirebase(whatsappData).then(success => {
+        // Firebase kaydetme işlemini timeout ile sınırla
+        const firebasePromise = saveWhatsAppDataToFirebase(whatsappData);
+        const timeoutPromise = new Promise((resolve) => {
+            setTimeout(() => resolve(false), 10000); // 10 saniye timeout
+        });
+        
+        Promise.race([firebasePromise, timeoutPromise]).then(success => {
             console.log('Firebase kaydetme sonucu:', success);
             if (success) {
                 console.log('Firebase Realtime Database\'e kaydedildi - Cross-device sync aktif');
                 showNotification('WhatsApp ayarları Firebase\'de senkronize edildi!', 'success');
             } else {
-                console.error('Firebase kaydı başarısız - success: false döndü');
+                console.error('Firebase kaydı başarısız veya timeout');
                 showNotification('Yerel kayıt başarılı, Firebase kaydı başarısız', 'warning');
             }
         }).catch(error => {
@@ -646,6 +652,26 @@ window.testFirebaseConnection = function() {
     } else {
         console.error('saveWhatsAppDataToFirebase fonksiyonu bulunamadı');
         showNotification('Firebase fonksiyonları yüklenmemiş!', 'error');
+    }
+};
+
+// Simple Firebase test function
+window.testSimpleFirebase = function() {
+    console.log('Basit Firebase testi başlatılıyor...');
+    
+    if (typeof testSimpleFirebaseWrite === 'function') {
+        testSimpleFirebaseWrite().then(success => {
+            if (success) {
+                showNotification('Basit Firebase testi başarılı!', 'success');
+            } else {
+                showNotification('Basit Firebase testi başarısız!', 'error');
+            }
+        }).catch(error => {
+            console.error('Basit Firebase test hatası:', error);
+            showNotification('Basit Firebase test hatası: ' + error.message, 'error');
+        });
+    } else {
+        showNotification('testSimpleFirebaseWrite fonksiyonu bulunamadı!', 'error');
     }
 };
 

@@ -253,7 +253,21 @@
                             
                             <div class="test-section">
                                 <h4>Test</h4>
+                                <div class="firebase-info">
+                                    <p><strong>Firebase Sorun Giderme:</strong></p>
+                                    <ul>
+                                        <li>1. <strong>Basit Firebase Testi</strong> - Temel yazma işlemini test eder</li>
+                                        <li>2. <strong>Firebase Bağlantısını Test Et</strong> - WhatsApp verilerini test eder</li>
+                                        <li>3. Console'da (F12) detaylı logları kontrol edin</li>
+                                        <li>4. Firebase Console'da database kurallarını kontrol edin</li>
+                                    </ul>
+                                    <p><strong>Firebase Database Kuralları:</strong> <code>{"rules": {"whatsapp": {".write": true, ".read": true}}}</code></p>
+                                </div>
                                 <div class="test-buttons">
+                                    <button class="test-btn" onclick="testSimpleFirebase()">
+                                        <span class="material-icons">bug_report</span>
+                                        Basit Firebase Testi
+                                    </button>
                                     <button class="test-btn" onclick="testFirebaseConnection()">
                                         <span class="material-icons">cloud</span>
                                         Firebase Bağlantısını Test Et
