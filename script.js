@@ -363,20 +363,55 @@ function hideLoginModal() {
 }
 
 function loginAdmin() {
-    // Create session for admin access
-    const sessionData = {
-        loggedIn: true,
-        timestamp: Date.now()
-    };
-    localStorage.setItem('admin_session', JSON.stringify(sessionData));
+    console.log('loginAdmin fonksiyonu çağrıldı');
     
-    hideLoginModal();
-    showNotification('Admin paneline başarıyla giriş yapıldı!', 'success');
-    
-    // Redirect to admin page
-    setTimeout(() => {
-        window.location.href = 'admin.html';
-    }, 1000);
+    try {
+        const usernameElement = document.getElementById('admin-username');
+        const passwordElement = document.getElementById('admin-password');
+        
+        if (!usernameElement || !passwordElement) {
+            console.error('Giriş formu elementleri bulunamadı!');
+            showNotification('Giriş formu yüklenemedi!', 'error');
+            return;
+        }
+        
+        const username = usernameElement.value.trim();
+        const password = passwordElement.value.trim();
+        
+        console.log('Giriş denemesi:', { username, password });
+        
+        // Check credentials
+        if (username === 'admin' && password === 'cihan123') {
+            console.log('Giriş başarılı! - Credentials doğru');
+            
+            // Create session for admin access
+            const sessionData = {
+                loggedIn: true,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('admin_session', JSON.stringify(sessionData));
+            console.log('Session oluşturuldu:', sessionData);
+            
+            hideLoginModal();
+            console.log('Modal kapatıldı');
+            
+            // Redirect to admin page immediately without notification
+            console.log('Admin paneline yönlendiriliyor...');
+            window.location.href = 'admin.html';
+        } else {
+            console.log('Giriş başarısız! - Credentials yanlış');
+            showNotification('Kullanıcı adı veya şifre hatalı!', 'error');
+            
+            // Clear password field
+            passwordElement.value = '';
+            
+            // Focus on username field
+            usernameElement.focus();
+        }
+    } catch (error) {
+        console.error('Giriş hatası:', error);
+        showNotification('Giriş sırasında bir hata oluştu!', 'error');
+    }
 }
 
 function checkAdminSession() {
