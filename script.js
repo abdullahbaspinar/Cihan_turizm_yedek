@@ -1010,9 +1010,9 @@ function initializeCounterAnimation() {
                 const target = parseInt(counter.getAttribute('data-target'));
                 const symbol = counter.nextElementSibling.textContent;
                 let current = 0;
-                const increment = target / 200; // Daha yavaş artış için 200 adım
-                const duration = 4000; // 4 saniye (daha yavaş)
-                const stepTime = duration / 200;
+                const increment = target / 100; // Daha hızlı artış için 100 adım
+                const duration = 2000; // 2 saniye (daha hızlı)
+                const stepTime = duration / 100;
                 
                 // Her sayaç için farklı delay ekle
                 setTimeout(() => {
@@ -1036,7 +1036,7 @@ function initializeCounterAnimation() {
                         }, 500);
                         
                     }, stepTime);
-                }, index * 300); // Her kart için 300ms delay
+                }, index * 200); // Her kart için 200ms delay
             });
         }
     };
